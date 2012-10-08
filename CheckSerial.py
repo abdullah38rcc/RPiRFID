@@ -1,10 +1,17 @@
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+    GPIO_available = True
+except ImportError:
+    GPIO_available = False
 import urllib
 import threading
 import time
+
+# Global
+# authorized = False
 
 # Web content handler
 class ReturnWebpage(Resource):
@@ -13,13 +20,15 @@ class ReturnWebpage(Resource):
         self.serialNum = serialNum
 
     def render_GET(self, request):
-        return "<html><body><pre>%s</pre></body></html>" % (self.serialNum,)
+        authorized = findSerial('dlserials.txt', str(self.serialNum))
+        return "<html><body><pre>%s</pre></body></html>" % (authorized,)
 
 # Root webpage
 class getSerial(Resource):
-  def getChild(self, name, request):
-      return ReturnWebpage(int(name))
+    def getChild(self, name, request):
+        return ReturnWebpage(int(name))
 
+# Class for background flashing of LED
 class FlashLED(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
@@ -29,6 +38,7 @@ class FlashLED(threading.Thread):
 		time.sleep(1)
 		GPIO.setup(12, GPIO.LOW)
 
+# Pulls down file from dropbox and saves to local disk
 def download(url):
     """ Download file from web and save """
     print 'Saving file ', url
@@ -39,6 +49,15 @@ def download(url):
     localFile.close()
     print 'done'
 
+# Background process to fetch file every minute		
+class FetchFile(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def run(self):
+        while True:
+            download('http://dl.dropbox.com/u/2435953/dlserials.txt')
+            time.sleep(60)
+
 def findSerial(fileName, textString):
     infile = open (fileName, "r")
     text = infile.read()
@@ -47,12 +66,14 @@ def findSerial(fileName, textString):
     search = textString
     index = text.find(search)
     if index > 0:
-        print search, "found at index ", index
-        background = FlashLED()
-        background.start()
+        print search, "found at index", index
+        if GPIO_available:
+            background = FlashLED()
+            background.start()
+        return True
     else:
         print 'Serial not found'
-
+        return False
 
 def GPIOinit():
     # Set GPIO for RPi pin numbers
@@ -70,20 +91,19 @@ if __name__ == '__main__':
         except IOError:
             print 'Filename not found.'
     else:
+        
+        # Setup GPIO
+        if GPIO_available:
+            GPIOinit()
+
+        # Start file grabbing process
+        backgroundFile = FetchFile()
+        backgroundFile.start()
+            
         # Start web server
         root = getSerial()
         factory = Site(root)
         reactor.listenTCP(8880, factory)
         reactor.run()
-
-        # Setup GPIO
-        GPIOinit()
-
-        download('http://dl.dropbox.com/u/2435953/dlserials.txt')
-        findSerial('dlserials.txt', "353568")
-
-"""
-        import os
-        print 'usage: %s http://server.com/file' % os.path.basename(sys.argv[0])"""
         
 
