@@ -19,5 +19,15 @@ Tried figuring out how to pass CardConnection.RAW_protocol
 		conn.getProtocol()
 			65536
 
+amosk@E6500:~/Workspace/RPiRFID$ python ProtocolCheck.py 
+	Failed to load symbol for: SCardCancelTransaction, /lib/i386-linux-gnu/libpcsclite.so.1: undefined symbol: SCardCancelTransaction!
+	3B 9E 95 80 1F C3 80 31 A0 73 BE 21 13 67 29 02 01 01 81 CD B9 
+	historical bytes:  80 31 A0 73 BE 21 13 67 29 02 01 01 81 CD
+	checksum:  0xB9
+	checksum OK:  True
+	T0 supported:  True
+	T1 supported:  False
+	T15 supported:  True
+
 
 
