@@ -1,0 +1,23 @@
+Notes:
+
+Added Python Support:
+http://pyscard.sourceforge.net/
+Installed swig
+sudo cp -r ~/Downloads/pcsc-lite-1.8.7/src/PCSC /usr/include/PCSC
+
+Getting connection error when running connection = r[1].createConnection(); connection.connect();
+Tried figuring out how to pass CardConnection.RAW_protocol
+	from smartcard import CardConnection
+	connection.connect( 0x00010000 ) # for RAW_protocol
+	or, this might have worked...
+		c = CardConnection
+		connection.setProtocol (c.CardConnection.RAW_protocol)
+	or this...
+		conn.connect( CardConnection.CardConnection.RAW_protocol )
+		conn.getReader()
+			'OMNIKEY 5x25 CL (OKCM0021107111459044297250858810) 00 00'
+		conn.getProtocol()
+			65536
+
+
+
