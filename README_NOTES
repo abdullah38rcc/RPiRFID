@@ -1,4 +1,8 @@
 Notes:
+pcscd man: http://linux.die.net/man/8/pcscd
+pyscard documentation: http://pyscard.sourceforge.net/
+pyscard class index: http://pyscard.sourceforge.net/epydoc/index.html
+pcsc-tools: http://ludovic.rousseau.free.fr/softwares/pcsc-tools/
 
 Added Python Support:
 http://pyscard.sourceforge.net/

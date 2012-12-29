@@ -1,3 +1,6 @@
+from smartcard.CardMonitoring import CardMonitor, CardObserver
+from smartcard.util import * 
+
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
@@ -28,6 +31,36 @@ class getSerial(Resource):
     def getChild(self, name, request):
         return ReturnWebpage(int(name))
 
+class CardObserver(CardObserver):
+    def __init__(self):
+        pass
+
+    def update(self, observable, (addedcards, removedcards)):
+        print "Added:  ", addedcards
+        print "Removed:", removedcards
+
+class CardObservingThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        # Instanciate a monitor
+        self.cardmonitor = CardMonitor()
+        # Create a new observerable
+        self.cardobserver = CardObserver()
+        self.success = False
+
+    def run(self):
+        self.cardmonitor.addObserver(self.cardobserver)
+        try:
+
+            self.success = True
+            print "card observer added"
+        except:
+            print "addObserver exception"
+            if (self.cardmonitor == None):
+                            print "cardmonitor does not exist"
+            if (self.cardobserver == None):
+                            print "cardobserver does not exist"
+
 # Class for background flashing of LED
 class FlashLED(threading.Thread):
 	def __init__(self):
@@ -53,10 +86,17 @@ def download(url):
 class FetchFile(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
+        self.kill = False
     def run(self):
-        while True:
+        while (not self.kill):
+            n = 0
+            # Check for a new file every 60 (2 * 30) seconds
+            while (not self.kill) and (n < 30):
+                time.sleep(2)
+                n += 1
             download('http://dl.dropbox.com/u/2435953/dlserials.txt')
-            time.sleep(60)
+    def stop(self):
+        self.kill == True
 
 def findSerial(fileName, textString):
     infile = open (fileName, "r")
@@ -96,14 +136,26 @@ if __name__ == '__main__':
         if GPIO_available:
             GPIOinit()
 
-        # Start file grabbing process
-        backgroundFile = FetchFile()
-        backgroundFile.start()
-            
-        # Start web server
-        root = getSerial()
-        factory = Site(root)
-        reactor.listenTCP(8880, factory)
-        reactor.run()
-        
+        # Start card monitor
+        card = CardObservingThread()
+        card.start()
 
+        if (card.success == True):
+            print "Starting Background File Service"
+            # Start file grabbing process
+            backgroundFile = FetchFile()
+            backgroundFile.start()
+
+            print "Starting Web Server"
+            # Start web server
+            root = getSerial()
+            factory = Site(root)
+            reactor.listenTCP(8880, factory)
+            reactor.run()
+
+        while True:
+            i = raw_input ("q for exit ")
+            if (i == 'q'):
+                if (backgroundFile != None):
+                    backgroundFile.stop()
+                break
