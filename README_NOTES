@@ -1,3 +1,54 @@
+Installation on Heathers Computer:
+sudo apt-get install pcscd
+download pyscard from http://sourceforge.net/projects/pyscard/
+extract pyscard-1.6.12 folder
+as per README file install gcc and swig (testing w/o pcsc-lite)
+sudo setup.py build_ext install
+error: "smartcard/scard/helpers.c:28:22: fatal error: winscard.h: No such file or directory"
+sudo apt-get install subversion
+svn co svn://anonscm.debian.org/pcsclite/trunk/
+su
+as per (http://pcsclite.alioth.debian.org/pcsclite.html): in PCSC run ./bootstrap, but that created errors. Had to..
+sudo apt-get install autoconf
+then "./bootstrap" worked
+./configure (did not work)
+commented out 5756 & 5757 in file "configure", still more errors
+apt-get install libudev-dev
+error "config.status: error: cannot find input file: `Makefile.in'"
+abandonded this method.
+downloaded pcsc-lite from https://alioth.debian.org/frs/?group_id=30105
+unzipped pcsc-lite-1.8.7 directory
+su
+./bootstrap
+./configure
+make
+make install (seems this only installs pcscd, which is available in aptitude)
+python setup.py build_ext install, error "smartcard/scard/helpers.c:28:22: fatal error: winscard.h: No such file or directory"
+sudo cp -r ~/Downloads/pcsc-lite-1.8.7/src/PCSC /usr/include/PCSC
+sudo python setup.py build_ext install, error "smartcard/scard/helpers.c:31:20: fatal error: Python.h: No such file or directory"
+sudo apt-get install python2.7-dev
+python setup.py build_ext install, finally worked.
+sudo pcscd -fd, daemon already running
+sudo apt-get install pcsc-tools
+pcsc_scan, "Using reader plug'n play mechanism; Scanning present readers...; Waiting for the first reader..."
+Seems USB part of pcscd is not installed
+in pcsc-lite directory:
+./bootstrap
+./configure --enable-libusb --disable-libudev, error "configure: error: libusb.h not found, use ./configure LIBUSB_CFLAGS=..."
+sudo apt-get install libusb-dev, tried again, same error.
+tried ./configure, make again to see if having libusb-dev installed helped.
+Found libpcsc*.so files in /usr/local/lib, tried copying to /usr/local/lib/pcsc/drivers, but it didn't help.
+Duh! Forgot drivers from HID!!!
+Downloaded ifdokrfid_lnx_i686-2.10.0.1.tar.gz from (http://forms.hidglobal.com/driverDownloads.php?techCat=19&prod_id=339#) (also in Evernote)
+Unziped... followed README...
+Skipped installing libusb v1.0.8
+as SU: ./install, which did: Copying ifdokrfid_lnx_i686-2.10.0.1.bundle to /usr/local/lib/pcsc/drivers
+sudo killall -9 pcscd
+sudo pcscd -fd
+WORKS!!!
+
+
+
 Notes:
 pcscd man: http://linux.die.net/man/8/pcscd
 pyscard documentation: http://pyscard.sourceforge.net/
