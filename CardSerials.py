@@ -26,9 +26,9 @@ def parseFile(inFile):
     localFile = open(inFile, "r")
     s = []
     d = {}
-
+    
     for line in localFile.readlines():
-        line.rstrip()
+        line = line.rstrip()
         s.append(line)
     localFile.close()
     # print s
@@ -50,8 +50,5 @@ if __name__ == '__main__':
 
  
     parseFile("dlserials.txt")
-
-    serials = {'a', 'b'}
-    print serials
     
 
