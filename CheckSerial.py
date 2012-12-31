@@ -63,13 +63,13 @@ class CardObservingThread(threading.Thread):
 
 # Class for background flashing of LED
 class FlashLED(threading.Thread):
-	def __init__(self):
-		threading.Thread.__init__(self)
-	def run(self):
-		print 'flashing led'
-		GPIO.setup(12, GPIO.HIGH)
-		time.sleep(1)
-		GPIO.setup(12, GPIO.LOW)
+    def __init__(self):
+        threading.Thread.__init__(self)
+        def run(self):
+            print 'flashing led'
+            GPIO.setup(12, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.setup(12, GPIO.LOW)
 
 # Pulls down file from dropbox and saves to local disk
 def download(url):
@@ -87,6 +87,7 @@ class FetchFile(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.kill = False
+        
     def run(self):
         while (not self.kill):
             n = 0
@@ -95,25 +96,11 @@ class FetchFile(threading.Thread):
                 time.sleep(2)
                 n += 1
             download('http://dl.dropbox.com/u/2435953/dlserials.txt')
+    
     def stop(self):
-        self.kill == True
+        self.kill = True
 
-def findSerial(fileName, textString):
-    infile = open (fileName, "r")
-    text = infile.read()
-    infile.close()
 
-    search = textString
-    index = text.find(search)
-    if index > 0:
-        print search, "found at index", index
-        if GPIO_available:
-            background = FlashLED()
-            background.start()
-        return True
-    else:
-        print 'Serial not found'
-        return False
 
 def GPIOinit():
     # Set GPIO for RPi pin numbers
@@ -122,7 +109,7 @@ def GPIOinit():
     GPIO.setup(12, GPIO.OUT)
     # set 12 low
     GPIO.setup(12, GPIO.LOW)
-	
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) == 2:
@@ -156,6 +143,6 @@ if __name__ == '__main__':
         while True:
             i = raw_input ("q for exit ")
             if (i == 'q'):
-                if (backgroundFile != None):
+                if (backgroundFile.isAlive()):
                     backgroundFile.stop()
                 break

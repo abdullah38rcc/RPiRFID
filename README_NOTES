@@ -40,7 +40,7 @@ tried ./configure, make again to see if having libusb-dev installed helped.
 Found libpcsc*.so files in /usr/local/lib, tried copying to /usr/local/lib/pcsc/drivers, but it didn't help.
 Duh! Forgot drivers from HID!!!
 Downloaded ifdokrfid_lnx_i686-2.10.0.1.tar.gz from (http://forms.hidglobal.com/driverDownloads.php?techCat=19&prod_id=339#) (also in Evernote)
-Unziped... followed README...
+Unziped... followed README...needed to have pcsc-lite already installed.
 Skipped installing libusb v1.0.8
 as SU: ./install, which did: Copying ifdokrfid_lnx_i686-2.10.0.1.bundle to /usr/local/lib/pcsc/drivers
 sudo killall -9 pcscd
