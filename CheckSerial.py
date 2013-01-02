@@ -1,6 +1,8 @@
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import * 
 
+import logging
+
 from CardSerials import CardSerials
 
 from twisted.web.server import Site
@@ -17,7 +19,12 @@ import time
 
 # Global
 # authorized = False
-debug = True
+logging.basicConfig()
+logger = logging.getLogger('CheckSerial.py')
+logger.setLevel(logging.DEBUG)
+
+# Setup Serial Processing Object
+cs = CardSerials()
 
 # Web content handler
 class ReturnWebpage(Resource):
@@ -41,12 +48,10 @@ class CardObserver(CardObserver):
     def update(self, observable, (addedcards, removedcards)):
         if (addedcards):
             cs.addCard(addedcards[0])
-            if (debug):
-                print "Added:  ", addedcards
+            logger.info('Added: %s', addedcards)
         if (removedcards):
             cs.removeCard(removedcards[0])
-            if (debug):
-                print "Removed:", removedcards
+            logger.info('Removed: %s', removedcards)
 
 class CardObservingThread(threading.Thread):
     def __init__(self):
@@ -62,14 +67,14 @@ class CardObservingThread(threading.Thread):
         try:
 
             self.success = True
-            if (debug):
-                print "card observer added"
+            logger.info('Card Observer Added')
+
         except:
-            print "addObserver exception"
+            logger.warning('addObserver exception')
             if (self.cardmonitor == None):
-                            print "cardmonitor does not exist"
+                logger.warning('cardmonitor does not exist')
             if (self.cardobserver == None):
-                            print "cardobserver does not exist"
+                logger.warning('cardobserver does not exist')
 
 # Class for background flashing of LED
 class FlashLED(threading.Thread):
@@ -84,15 +89,13 @@ class FlashLED(threading.Thread):
 # Pulls down file from dropbox and saves to local disk
 def download(url):
     """ Download file from web and save """
-    if (debug):
-        print 'Saving file ', url
+    logger.debug('Saving File %s', url)
     webFile = urllib.urlopen(url)
     localFile = open("dlserials.txt", "w")
     localFile.write(webFile.read())
     webFile.close()
     localFile.close()
-    if (debug):
-        print 'done'
+    logger.debug('Done saving file')
 
 # Background process to fetch file every minute		
 class FetchFile(threading.Thread):
@@ -124,58 +127,60 @@ def GPIOinit():
     # set 12 low
     GPIO.setup(12, GPIO.LOW)
 
-if __name__ == '__main__':
-    import sys
-    if len(sys.argv) == 2:
-        try:
-            download(sys.argv[1])
-        except IOError:
-            print 'Filename not found.'
-    else:
-        
-        # Setup GPIO
-        if GPIO_available:
-            GPIOinit()
-            
-        # Setup Serial Processing Object
-        cs = CardSerials()
-
-        # Start card monitor
-        card = CardObservingThread()
-        card.start()
-
-        if (card.success == True):
-            print "Starting Background File Service"
-            # Start file grabbing process
-            backgroundFile = FetchFile()
-            backgroundFile.start()
-
-            print "Starting Web Server"
-            # Start web server
-            root = getSerial()
-            factory = Site(root)
-            reactor.listenTCP(8880, factory)
-            reactor.run()
-
-        while True:
-            i = raw_input ("q for exit ")
-            if (i == 'q'):
-                if (backgroundFile.isAlive()):
-                    backgroundFile.stop()
-                break
-            # New file downloaded. Parse to dict
-            if (backgroundFile.newFile == True):
-                backgroundFile.newFile = False
-                cs.parseFile("dlserials.txt")
-            
-            if (cs.currentCards):
-                if (cs.validCards()):
-                    if (debug):
-                        print "Valid Card Found"
-                else:
-                    if (debug):
-                        print "No Valid Card Found"
+def main():
+    
+        import sys
+        if len(sys.argv) == 2:
+            try:
+                download(sys.argv[1])
+            except IOError:
+                print 'Filename not found.'
+        else:  
+            # Setup GPIO
+            if GPIO_available:
+                logger.info("Enabling GPIO")
+                GPIOinit()
+    
+            # Start card monitor
+            card = CardObservingThread()
+            card.start()
+    
+            if (card.success == True):
+                logger.info("Starting Background File Service")
+                # Start file grabbing process
+                backgroundFile = FetchFile()
+                backgroundFile.start()
+    
+                print "Starting Web Server"
+                # Start web server
+                root = getSerial()
+                factory = Site(root)
+                reactor.listenTCP(8880, factory)
+                reactor.run()
             else:
-                if (debug):
-                    print "No Cards Present"
+                logger.warning("Did not start background file service")
+    
+            Loop = True
+            while (Loop):
+                i = raw_input ("q for exit ")
+                if (i == 'q'):
+                    if (backgroundFile.isAlive()):
+                        backgroundFile.stop()
+                    Loop = False
+                    break
+                # New file downloaded. Parse to dict
+                if (backgroundFile.newFile == True):
+                    backgroundFile.newFile = False
+                    cs.parseFile("dlserials.txt")
                 
+                if (cs.currentCards):
+                    if (cs.validCards()):
+                        logger.debug("Valid card found")
+                    else:
+                        logger.debug("Card Present but Not Valid")
+                else:
+                    logger.debug("No Cards Present")
+                    
+if (__name__ == "__main__"):
+    main()
+    
