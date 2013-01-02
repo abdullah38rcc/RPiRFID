@@ -151,11 +151,11 @@ def main():
                 backgroundFile.start()
 
                 # Start web server    
-                logger.info("Starting Web Server")
-                root = getSerial()
-                factory = Site(root)
-                reactor.listenTCP(8880, factory)
-                reactor.run()
+                #logger.info("Starting Web Server")
+                #root = getSerial()
+                #factory = Site(root)
+                #reactor.listenTCP(8880, factory)
+                #reactor.run()
             else:
                 logger.warning("Did not start background file service")
     
@@ -163,10 +163,11 @@ def main():
             while (Loop):
                 i = raw_input ("q for exit\n")
                 if (i == 'q'):
+                    logger.info('Quitting')
                     if (backgroundFile.isAlive()):
                         backgroundFile.stop()
                     Loop = False
-                    break
+                    # break # breaks out of the while loop
                 # New file downloaded. Parse to dict
                 if (backgroundFile.newFile == True):
                     backgroundFile.newFile = False

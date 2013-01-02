@@ -11,11 +11,16 @@ class CardSerials():
         self.d = {}
         self.serials = {}
         
+        self.logger.debug('Hello from CardSerials!')
+        
     def addCard(self, serial):
         self.currentCards.append(serial)
+        self.logger.debug("Added a card to the list")
     
     def removeCard(self, serial):
         self.currentCards.remove(serial)
+        self.logger.debug("Attempted to removed a card from the list")
+
     
     def validCards(self):
         """Returns True if there are any cards present that are authorized"""
