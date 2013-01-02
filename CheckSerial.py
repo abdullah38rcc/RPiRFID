@@ -63,9 +63,8 @@ class CardObservingThread(threading.Thread):
         self.success = False
 
     def run(self):
-        self.cardmonitor.addObserver(self.cardobserver)
         try:
-
+            self.cardmonitor.addObserver(self.cardobserver)
             self.success = True
             logger.info('Card Observer Added')
 
@@ -145,14 +144,14 @@ def main():
             card = CardObservingThread()
             card.start()
     
-            if (card.success == True):
+            if (card.is_alive()):
                 logger.info("Starting Background File Service")
                 # Start file grabbing process
                 backgroundFile = FetchFile()
                 backgroundFile.start()
-    
-                print "Starting Web Server"
-                # Start web server
+
+                # Start web server    
+                logger.info("Starting Web Server")
                 root = getSerial()
                 factory = Site(root)
                 reactor.listenTCP(8880, factory)
@@ -162,7 +161,7 @@ def main():
     
             Loop = True
             while (Loop):
-                i = raw_input ("q for exit ")
+                i = raw_input ("q for exit\n")
                 if (i == 'q'):
                     if (backgroundFile.isAlive()):
                         backgroundFile.stop()
