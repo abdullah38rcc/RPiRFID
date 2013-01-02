@@ -1,11 +1,53 @@
-
+debug = True
 serials = {}
 
 class CardSerials():
     def __init__(self):
-        pass
+        self.currentCards = []
+        self.d = {}
+        
+    def addCard(self, serial):
+        self.currentCards.append(serial)
+    
+    def removeCard(self, serial):
+        self.currentCards.remove(serial)
+    
+    def validCards(self):
+        """Returns True if there are any cards present that are authorized"""
+        for s in self.currentCards:
+            if s in self.d:
+                return True
+            else:
+                return False
+    
+    def parseFile(self, inFile):
+        """Take in a file of serial numbers and return a dictionary of serials"""
+        
+        # Open the file for reading in
+        localFile = open(inFile, "r")
+    
+        # transfer lines of serials to a list        
+        s = []
+        
+        for line in localFile.readlines():
+            line = line.rstrip()
+            s.append(line)
+        localFile.close()
+        if (debug):
+            print "Parsed File into list: "
+            print s 
+        
+        # transfer serials from the list to a dictionary
+        for x in s:
+            self.d[x] = True
+        if (debug):
+            print "Parsed Dictionary: "
+            print self.d
+        
+        return self.d
+    
 
-def findSerial(fileName, textString):
+def oldFindSerial(fileName, textString):
     infile = open (fileName, "r")
     text = infile.read()
     infile.close()
@@ -22,33 +64,15 @@ def findSerial(fileName, textString):
         print 'Serial not found'
         return False
 
-def parseFile(inFile):
-    localFile = open(inFile, "r")
-    s = []
-    d = {}
-    
-    for line in localFile.readlines():
-        line = line.rstrip()
-        s.append(line)
-    localFile.close()
-    # print s
-    
-    for x in s:
-        d[x] = True
-        
-    print d
-    
-
-def getFile(filePath):
-    pass
-
-
 if __name__ == '__main__':
     # import urllib
     # import twisted?
     # fetch file
 
- 
-    parseFile("dlserials.txt")
-    
+    #d = parseFile("dlserials.txt")
+    #if "3B 06 01 00 38 05 50 07" in d:
+    #    print "Found"
+        
+    #print findSerial(d, "3B 06 01 00 38 05 50 07")
+    pass
 

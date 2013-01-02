@@ -1,6 +1,8 @@
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import * 
 
+from CardSerials import CardSerials
+
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
@@ -15,6 +17,7 @@ import time
 
 # Global
 # authorized = False
+debug = True
 
 # Web content handler
 class ReturnWebpage(Resource):
@@ -36,8 +39,14 @@ class CardObserver(CardObserver):
         pass
 
     def update(self, observable, (addedcards, removedcards)):
-        print "Added:  ", addedcards
-        print "Removed:", removedcards
+        if (addedcards):
+            cs.addCard(addedcards[0])
+            if (debug):
+                print "Added:  ", addedcards
+        if (removedcards):
+            cs.removeCard(removedcards[0])
+            if (debug):
+                print "Removed:", removedcards
 
 class CardObservingThread(threading.Thread):
     def __init__(self):
@@ -53,7 +62,8 @@ class CardObservingThread(threading.Thread):
         try:
 
             self.success = True
-            print "card observer added"
+            if (debug):
+                print "card observer added"
         except:
             print "addObserver exception"
             if (self.cardmonitor == None):
@@ -74,19 +84,22 @@ class FlashLED(threading.Thread):
 # Pulls down file from dropbox and saves to local disk
 def download(url):
     """ Download file from web and save """
-    print 'Saving file ', url
+    if (debug):
+        print 'Saving file ', url
     webFile = urllib.urlopen(url)
     localFile = open("dlserials.txt", "w")
     localFile.write(webFile.read())
     webFile.close()
     localFile.close()
-    print 'done'
+    if (debug):
+        print 'done'
 
 # Background process to fetch file every minute		
 class FetchFile(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.kill = False
+        self.newFile = False
         
     def run(self):
         while (not self.kill):
@@ -96,6 +109,7 @@ class FetchFile(threading.Thread):
                 time.sleep(2)
                 n += 1
             download('http://dl.dropbox.com/u/2435953/dlserials.txt')
+            self.newFile = True
     
     def stop(self):
         self.kill = True
@@ -122,6 +136,9 @@ if __name__ == '__main__':
         # Setup GPIO
         if GPIO_available:
             GPIOinit()
+            
+        # Setup Serial Processing Object
+        cs = CardSerials()
 
         # Start card monitor
         card = CardObservingThread()
@@ -146,3 +163,19 @@ if __name__ == '__main__':
                 if (backgroundFile.isAlive()):
                     backgroundFile.stop()
                 break
+            # New file downloaded. Parse to dict
+            if (backgroundFile.newFile == True):
+                backgroundFile.newFile = False
+                cs.parseFile("dlserials.txt")
+            
+            if (cs.currentCards):
+                if (cs.validCards()):
+                    if (debug):
+                        print "Valid Card Found"
+                else:
+                    if (debug):
+                        print "No Valid Card Found"
+            else:
+                if (debug):
+                    print "No Cards Present"
+                
