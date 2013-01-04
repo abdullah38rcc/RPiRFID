@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import RPi.GPIO as GPIO
 import time
 
@@ -31,10 +33,14 @@ def testSeq():
     time.sleep(.5)
 
 def allLampsOn():
-    while True:
-        GPIO.output(RED, GPIO.HIGH)
-        GPIO.output(GREEN, GPIO.HIGH)
-        GPIO.output(BLUE, GPIO.HIGH)
+    # while True:
+    GPIO.output(RED, GPIO.HIGH)
+    GPIO.output(GREEN, GPIO.HIGH)
+    GPIO.output(BLUE, GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(RED, GPIO.LOW)
+    GPIO.output(GREEN, GPIO.LOW)
+    GPIO.output(BLUE, GPIO.LOW)
 
 if __name__ == "__main__":
     testSeq()
