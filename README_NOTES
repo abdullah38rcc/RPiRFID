@@ -118,11 +118,17 @@ Verified USB drobdir
 # nano /usr/local/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
 Info to add to Info.plist - Bus 001 Device 006: ID 076b:5124 OmniKey AG; (idVendor:idProduct); Manufacturer: OMNIKEY; SerialNumber: OKCM0021107111459044297250858810
 
+... TODO
 cd ~
 wget https://downloads.sourceforge.net/project/pyscard/pyscard/pyscard%201.6.12/pyscard-1.6.12.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fpyscard%2F&ts=1357143700&use_mirror=superb-dca3
 tar -zxvf pyscard-1.6.12.tar.gz
 sudo apt-get install swig
 
+4 Jan 13: To get scripts running from /etc/init.d/scripts
+# chown root flash.py
+# chmod +x flash.py
+Add "#!/usr/bin/env python" to top of flash.py
+# update-rc.d scripts defaults
 
 Notes:
 pcscd man: http://linux.die.net/man/8/pcscd
