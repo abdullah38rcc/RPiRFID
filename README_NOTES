@@ -1,3 +1,9 @@
+Links:
+pcscd man: http://linux.die.net/man/8/pcscd
+pyscard documentation: http://pyscard.sourceforge.net/
+pyscard class index: http://pyscard.sourceforge.net/epydoc/index.html
+pcsc-tools: http://ludovic.rousseau.free.fr/softwares/pcsc-tools/
+
 Installation on Heathers Computer:
 sudo apt-get install pcscd
 download pyscard from http://sourceforge.net/projects/pyscard/
@@ -47,101 +53,15 @@ sudo killall -9 pcscd
 sudo pcscd -fd
 WORKS!!!
 
-Raspberry Pi, 2 Jan
-# sudo apt-get install gcc pcscd pcsc-tools python2.7-dev autoconf
-# wget https://alioth.debian.org/frs/download.php/3842/pcsc-lite-1.8.7.tar.bz2
-# tar -xjvf pcsc-lite-1.8.7.tar.bz2
-# cd pcsc-lite-1.8.7/
-# ./bootstrap
-	autoreconf: running: libtoolize --copy
-	Can't exec "libtoolize": No such file or directory at /usr/share/autoconf/Autom4te/FileUtils.pm line 345, <GEN2> line 5.
-	autoreconf: failed to run libtoolize: No such file or directory
-	autoreconf: libtoolize is needed because this package uses Libtool
-# sudo apt-get install libtool
-# ./bootstrap
-# ./configure
-# make
-# make install (seems this only installs pcscd, which is available in aptitude)
-The HID drivers are behind an Terms and Conditions Acceptance Notice so get them from Drobbox
-# cd ~
-# wget https://dl.dropbox.com/u/2435953/ifdokrfid_lnx_i686-2.10.0.1.tar.gz
-# tar -zxvf ifdokrfid_lnx_i686-2.10.0.1.tar.gz
-# cd ifdokrfid_lnx_i686-2.10.0.1/
-# ./install
-# killall -9 pcscd
-# pcscd -fd
-	Had errors looking for USB device, rebooted
-	Still same errors after rebooting
-	Tried: # cp -r ~/pcsc-lite-1.8.7/src/PCSC/ /usr/include/PCSC
-	Tried: # sudo apt-get install libusb
-	Still no worky
-	A search for "arm" at http://forms.hidglobal.com/main/technical-support/ shows the HID driver doesn't work on ARM but for most cases there is a CCID driver available thich works will all HID contact readers.
-Found on at same source for PCSC Lite
-# wget https://alioth.debian.org/frs/download.php/3768/ccid-1.4.8.tar.bz2
-# tar -xjvf ccid-1.4.8.tar.bz2
-# cd ccid-1.4.8/
-# ./configure
-	configure: error: libusb.h not found, install libusb or use ./configure LIBUSB_CFLAGS=...
-	# sudo apt-get install libusb-dev
-	already installed
-	As per README, need to point to libusb directories
-	# find / -name 'usb.h'
-		/usr/include/usb.h
-	# find / -name 'libusb.so'
-		/usr/lib/arm-linux-gnueabihf/libusb.so
-	# find / -name 'libusb.h'
-	# apt-get install libusb-1.0-0 libusb-1.0-0-dev
-		libusb-1.0-0 is already the newest version.
-		libusb-1.0-0 set to manually installed.
-		The following NEW packages will be installed:
-  			libusb-1.0-0-dev
-	# ./configure
-	worked
-# make
-# make install
-As per make install directions
-# cp src/92_pcscd_ccid.rules /etc/udev/rules.d/
-# reboot
-# nano /etc/udev/rules.d/z98_omnikey_rfid.rules
-	commented out line that contained idProdect=5124
-# reboot
-pcscd keeps saying its looking for the ifdokrfid drivers. Attempted removeal of HID drivers
-# rm -r /usr/local/lib/pcsc/drivers/ifdokrfid_lnx_i686-2.10.0.1.bundle/
-# rm /etc/cmrfid.ini
-# rm /etc/udev/rules.d/z98_omnikey_rfid.rules 
-# rm /lib/udev/ok_pcscd_hotplug.sh
-Now it can't find any USB drivers
-Verified USB drobdir
-# pkg-config libpcsclite --variable=usbdropdir
-	/usr/local/lib/pcsc/drivers
-
-# nano /usr/local/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
-Info to add to Info.plist - Bus 001 Device 006: ID 076b:5124 OmniKey AG; (idVendor:idProduct); Manufacturer: OMNIKEY; SerialNumber: OKCM0021107111459044297250858810
-
-... TODO
-cd ~
-wget https://downloads.sourceforge.net/project/pyscard/pyscard/pyscard%201.6.12/pyscard-1.6.12.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fpyscard%2F&ts=1357143700&use_mirror=superb-dca3
-tar -zxvf pyscard-1.6.12.tar.gz
-sudo apt-get install swig
-
-4 Jan 13: To get scripts running from /etc/init.d/scripts
-# chown root flash.py
-# chmod +x flash.py
-Add "#!/usr/bin/env python" to top of flash.py
-# update-rc.d scripts defaults
-
-Notes:
-pcscd man: http://linux.die.net/man/8/pcscd
-pyscard documentation: http://pyscard.sourceforge.net/
-pyscard class index: http://pyscard.sourceforge.net/epydoc/index.html
-pcsc-tools: http://ludovic.rousseau.free.fr/softwares/pcsc-tools/
-
 Added Python Support:
 http://pyscard.sourceforge.net/
 Installed swig
 sudo cp -r ~/Downloads/pcsc-lite-1.8.7/src/PCSC /usr/include/PCSC
 run "sudo pcscd -fd" for daemon
 
+
+
+E6500 Log:
 Getting connection error when running connection = r[1].createConnection(); connection.connect();
 Tried figuring out how to pass CardConnection.RAW_protocol
 	from smartcard import CardConnection
@@ -166,5 +86,21 @@ amosk@E6500:~/Workspace/RPiRFID$ python ProtocolCheck.py
 	T1 supported:  False
 	T15 supported:  True
 
+7 Jan 13: Trying to figure out ARM compatible drivers for HID reader, on E6500
+Show what devices CCID is compatable with...
+$ cat /etc/libccid_Info.plist
+Tried http://linuxsat-support.com/linux-pc-server-tutorials/1712-how-install-omnikey-readers-linux-pc.html; but looks too old.
 
+8 Jan 13: Gave up on 5325 due to lack of support. Wired up Adafruit PN532 V1.0 RFID/NFC shield.
+Followed "http://www.microbuilder.eu/Blog/11-02-19/Using_libnfc_with_the_PN532_Linux.aspx" to install libnfc
+$ wget http://libnfc.googlecode.com/files/libnfc-x.x.x.tar.gz
+$ tar -xvzf libnfc-x.x.x.tar.gz
+$ cd libnfc-x.x.x (Got 1.6 RC1)
+$ ./configure --with-drivers=pn532_uart --enable-serial-autoprobe --enable-debug
+$ make clean
+$ make
+$ sudo make install
+Link libraries (http://www.libnfc.org/community/topic/502/solved-help-with-nfclist-error-libraries-libnfcso1/) 
+$ sudo sh -c "echo /usr/local/lib > /etc/ld.so.conf.d/usr-local-lib.conf"
+$ sudo ldconfig
 
