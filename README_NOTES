@@ -104,3 +104,11 @@ Link libraries (http://www.libnfc.org/community/topic/502/solved-help-with-nfcli
 $ sudo sh -c "echo /usr/local/lib > /etc/ld.so.conf.d/usr-local-lib.conf"
 $ sudo ldconfig
 
+Example of the GetFirmwareVersion command:
+with Preamble and Postamble:
+00 00 FF 06 FA D5 03 32 01 05 07 E9 00
+without Preamble and Postamble:
+00 FF 06 FA D5 03 32 01 05 07 E9
+
+10 Jan 13: 
+

@@ -1,0 +1,45 @@
+pn532_packetbuffer[0] = PN532_COMMAND_GETFIRMWAREVERSION;  (0x02)
+
+  if (! sendCommandCheckAck(pn532_packetbuffer, 1))
+    return 0;
+
+PREAMBLE + PREAMBLE + STARTCODE2 + cmdlen + (~cmdlen + 1) + HOSTTOPN532 + COMMAND(S) + ~checksum + POSTAMBLE
+
+PrintHex(const byte * data, const uint32_t numBytes)
+
+Get Firmware Version:
+Sending: 
+PREAMBLE 0x00 
+PREAMBLE 0x00 
+STARTCODE2 0xFF 
+cmdlen 0x02 (cmdlen + 1)
+~cmdlen+1 0xFE 
+HOSTTOPN532 0xD4 
+cmd 0x02 (GETFIRMWAREVERSION)
+~checksum 0x2A 
+POSTAMBLE 0x00
+
+0000FF02FED4022A00
+
+// configure to read RFID tags (SAM)
+cmds: 14 01 14 01
+
+Sending: 
+PREAMBLE 0x00 
+PREAMBLE 0x00 
+STARTCODE2 0xFF 
+cmdlen 0x05 
+~cmdlen+1 0xFB 
+HOSTTOPN532 0xD4 
+cmd 0x14 // SAM Config
+cmd 0x01 // Normal Mode
+cmd 0x14 // timeout 50ms * 20 = 1 second
+cmd 0x01 // use IRQ Pin
+~checksum 0x02 
+POSTAMBLE 0x0
+
+IRQ received
+Reading:  0x0 0x0 0xFF 0x0 0xFF 0x0
+Reading:  0x0 0x0 0xFF 0x2 0xFE 0xD5 0x15 0x16
+Waiting for an ISO14443A Card ...
+
