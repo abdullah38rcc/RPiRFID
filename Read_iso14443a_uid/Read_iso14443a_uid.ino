@@ -1,3 +1,4 @@
+
 /**************************************************************************/
 /*! 
     @file     iso14443a_uid.pde
@@ -5,7 +6,8 @@
     @license  BSD (see license.txt)
 
     This example will attempt to connect to an ISO14443A
-    card or tag and retrieve some basic information about it
+    card or tag and retrieve some basic inf
+    ormation about it
     that can be used to determine what type of card it is.   
    
     Note that you need the baud rate to be 115200 because we need to print
@@ -72,12 +74,13 @@ void loop(void) {
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
   
   if (success) {
-    Serial.println("Found a card!");
-    Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
+    // Serial.println("Found a card!");
+    // Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
     Serial.print("UID Value: ");
     for (uint8_t i=0; i < uidLength; i++) 
     {
-      Serial.print(" 0x");Serial.print(uid[i], HEX); 
+      //Serial.print(" 0x");
+      Serial.print(uid[i], HEX); 
     }
     Serial.println("");
     // Wait 1 second before continuing
@@ -89,3 +92,4 @@ void loop(void) {
     //Serial.println("Timed out waiting for a card");
   }
 }
+
