@@ -110,5 +110,47 @@ with Preamble and Postamble:
 without Preamble and Postamble:
 00 FF 06 FA D5 03 32 01 05 07 E9
 
-10 Jan 13: 
+21 Jan 13: 
+Got 2 NFC Readers in the mail.
+Followed http://www.libnfc.org/documentation/installation
+$ cd ~/Downloads/libnfc-1.6.0-rc1/
+$ sudo apt-get install libusb-dev libpcsclite-dev
+$ make clean
+$ ./configure
+$ make
+$ sudo make install
+$ utils/nfc-probe
+"Unable to access NFC reader"
+$ sudo apt
+$ -get install autoconf libtool
+$ autoreconf -vis
+$ ./configure
+Noticed: 
+   Selected drivers:
+   acr122........... yes
+   acr122s.......... yes
+   arygon........... yes
+   pn53x_usb........ yes
+   pn532_uart....... no
+$ make
+Getting libtool version mismatch errors
+Stopping
+
+22 Jan 13
+As per "http://stackoverflow.com/questions/3096989/libtool-version-mismatch-error"
+$ autoreconf -i
+$ ./configure && make && sudo make install
+	$ nfc-list
+	nfc-list uses libnfc 1.6.0-rc1 (rexported)
+	nfc-list: ERROR: Unable to open NFC device.
+// read that the device is pcsc compliant and pcscd will catch the device
+$ sudo killall -9 pcscd
+$ nfc-list
+// same problem
+$ ./configure --with-drivers=acr122
+	Selected drivers:
+	   acr122........... yes
+$ make clean && make && sudo make install
+// still bad. Every time I run nfc-list pcscd is run. Ran pcscd -fd and... GOT ATR Serials back from a NFC tag!!!
+
 

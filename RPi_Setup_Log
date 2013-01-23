@@ -78,10 +78,22 @@ Add "#!/usr/bin/env python" to top of flash.py
 TODO: scripts didn't auto start. Look at
 http://trouch.com/2012/08/03/airpi-airplay-audio-with-raspberry/
 
-... TODO FOR PYTHON SUPPORT
+
+22 Jan 13:
+Got the ACS NFC reader working with (pcscd -fd) on the RPi!!!
+	00000099 eventhandler.c:387:EHStatusHandlerThread() Card inserted into ACS ACR122U PICC Interface 00 00
+	00000162 Card ATR: 3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 00 03 00 00 00 00 68 
+	05001158 ifdhandler.c:1119:IFDHPowerICC() action: PowerDown, usb:072f/2200:libudev:0:/dev/bus/usb/001/006 (lun: 0)
+	00001284 eventhandler.c:446:EHStatusHandlerThread() powerState: POWER_STATE_UNPOWERED
+	01954885 eventhandler.c:325:EHStatusHandlerThread() Card Removed From ACS ACR122U PICC Interface 00 00
+
+// Installed pyscard for Python support
+
 cd ~
 wget https://downloads.sourceforge.net/project/pyscard/pyscard/pyscard%201.6.12/pyscard-1.6.12.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fpyscard%2F&ts=1357143700&use_mirror=superb-dca3
 tar -zxvf pyscard-1.6.12.tar.gz
-sudo apt-get install swig
 
+sudo apt-get install swig gcc
+
+$ sudo python setup.py build_ext install
 
