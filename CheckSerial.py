@@ -11,8 +11,10 @@ from twisted.internet import reactor
 try:
     import RPi.GPIO as GPIO
     GPIO_available = True
+    print "GPIO Available"
 except ImportError:
     GPIO_available = False
+    print "GPIO Unavailable"
 import urllib
 import threading
 import time
