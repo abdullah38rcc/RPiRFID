@@ -163,12 +163,12 @@ def main():
     
             Loop = True
             while (Loop):
-                i = raw_input ("q for exit\n")
-                if (i == 'q'):
-                    logger.info('Quitting')
-                    if (backgroundFile.isAlive()):
-                        backgroundFile.stop()
-                    Loop = False
+                # i = raw_input ("q for exit\n")
+                #if (i == 'q'):
+                #    logger.info('Quitting')
+                #    if (backgroundFile.isAlive()):
+                #        backgroundFile.stop()
+                #    Loop = False
                     # break # breaks out of the while loop
                 # New file downloaded. Parse to dict
                 if (backgroundFile.newFile == True):
