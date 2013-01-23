@@ -177,9 +177,9 @@ def main():
                 
                 if (cs.currentCards):
                     if (cs.validCards()):
-                        logger.debug("Valid card found")
+                        logger.info("Valid card found")
                     else:
-                        logger.debug("Card Present but Not Valid")
+                        logger.info("Card Present but Not Valid")
                 else:
                     logger.debug("No Cards Present")
                     
