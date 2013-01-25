@@ -12,9 +12,16 @@ class CardSerials():
         self.serials = {}
                 
     def addCard(self, serial):
-        self.currentCards.append(serial)
-        self.logger.info("Added a card to the list")
-        self.logger.debug("Serial: %s", serial)
+        self.logger.debug("Attempting to add %s", serial)
+        #if (serial.find('/')):
+        serialStripped = '3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 00 03 00 00 00 00 68'
+        self.logger.debug('Post formating: %s', serialStripped)
+        try:
+            self.currentCards.append(serialStripped)
+            self.logger.info("Added a card to the list:")
+            self.logger.debug("Added serial: %s", serialStripped)
+        except:
+            self.logger.debug("Could not add to list: %s", serialStripped)
     
     def removeCard(self, serial):
         try:
@@ -29,6 +36,8 @@ class CardSerials():
         for s in self.currentCards:
             self.logger.debug('Testing for s in self.d')
             self.logger.debug('Looking for: %s', s)
+          
+            #if (self.d[s]):
             if s in self.d:
                 return True
             else:

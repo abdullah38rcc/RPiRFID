@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import * 
@@ -32,7 +32,7 @@ except ImportError:
 # authorized = False
 logging.basicConfig()
 logger = logging.getLogger('CheckSerial.py')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 if (GPIO_available):
     logger.debug("GPIO Available")
