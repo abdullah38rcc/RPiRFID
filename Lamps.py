@@ -7,10 +7,11 @@ RED = 23
 GREEN = 22
 BLUE = 7
 
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(RED, GPIO.OUT) # Pin 23, GPIO11, SCLK
-GPIO.setup(GREEN, GPIO.OUT) # Pin 22, GPIO25, ARM_TCK
-GPIO.setup(BLUE, GPIO.OUT) # Pin 7, GPIO4, GPCLK0
+def initGPIO():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(RED, GPIO.OUT) # Pin 23, GPIO11, SCLK
+    GPIO.setup(GREEN, GPIO.OUT) # Pin 22, GPIO25, ARM_TCK
+    GPIO.setup(BLUE, GPIO.OUT) # Pin 7, GPIO4, GPCLK0
 
 """
 If no badge present, turn blue light on.

@@ -13,16 +13,22 @@ class CardSerials():
                 
     def addCard(self, serial):
         self.currentCards.append(serial)
-        self.logger.debug("Added a card to the list")
+        self.logger.info("Added a card to the list")
+        self.logger.debug("Serial: %s", serial)
     
     def removeCard(self, serial):
-        self.currentCards.remove(serial)
-        self.logger.debug("Attempted to removed a card from the list")
-
+        try:
+            self.currentCards.remove(serial)
+            self.logger.info("Removed a card from the list")
+            self.logger.debug("Removed: %s", serial)
+        except:
+            self.logger.debug("Could not remove %s", serial)
     
     def validCards(self):
         """Returns True if there are any cards present that are authorized"""
         for s in self.currentCards:
+            self.logger.debug('Testing for s in self.d')
+            self.logger.debug('Looking for: %s', s)
             if s in self.d:
                 return True
             else:
@@ -43,14 +49,14 @@ class CardSerials():
             line = line.rstrip()
             s.append(line)
         localFile.close()
-        tempText = "Parsed " + str(count) + "lines into list"
+        tempText = "Parsed " + str(count) + " lines into list:"
         self.logger.debug(tempText)
         self.logger.debug(s)
    
         # transfer serials from the list to a dictionary
         for x in s:
             self.d[x] = True
-        self.logger.debug('Parsed Dictionary')
+        self.logger.debug('Parsed Dictionary:')
         self.logger.debug(self.d)
         
         return self.d
