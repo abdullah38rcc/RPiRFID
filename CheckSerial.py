@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import * 
 
@@ -8,22 +10,34 @@ from CardSerials import CardSerials
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
-try:
-    import RPi.GPIO as GPIO
-    GPIO_available = True
-    print "GPIO Available"
-except ImportError:
-    GPIO_available = False
-    print "GPIO Unavailable"
 import urllib
 import threading
 import time
+
+"""
+try:
+    import RPi.GPIO as GPIO
+    GPIO_available = True
+except ImportError:
+    GPIO_available = False
+"""
+try:
+    import Lamps
+    GPIO_available = True
+except ImportError:
+    GPIO_available = False
+
 
 # Global
 # authorized = False
 logging.basicConfig()
 logger = logging.getLogger('CheckSerial.py')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+
+if (GPIO_available):
+    logger.debug("GPIO Available")
+else:
+    logger.debug("GPIO Not Available")
 
 # Setup Serial Processing Object
 cs = CardSerials()
@@ -63,6 +77,7 @@ class CardObservingThread(threading.Thread):
         # Create a new observerable
         self.cardobserver = CardObserver()
         self.success = False
+        time.sleep(2)
 
     def run(self):
         try:
@@ -77,6 +92,7 @@ class CardObservingThread(threading.Thread):
             if (self.cardobserver == None):
                 logger.warning('cardobserver does not exist')
 
+"""
 # Class for background flashing of LED
 class FlashLED(threading.Thread):
     def __init__(self):
@@ -86,6 +102,7 @@ class FlashLED(threading.Thread):
             GPIO.setup(12, GPIO.HIGH)
             time.sleep(1)
             GPIO.setup(12, GPIO.LOW)
+"""
 
 # Pulls down file from dropbox and saves to local disk
 def download(url):
@@ -106,20 +123,29 @@ class FetchFile(threading.Thread):
         self.newFile = False
         
     def run(self):
-        while (not self.kill):
-            n = 0
+#        while (not self.kill):
+        while (True):
             # Check for a new file every 60 (2 * 30) seconds
+            try:                
+                download('http://dl.dropbox.com/u/2435953/dlserials.txt')
+                logging.info('downloaded file')
+                self.newFile = True
+            except:
+                logging.warning('could not download serial file')
+            sleep(60)
+
+"""
+            # old thread code
+            n = 0
             while (not self.kill) and (n < 30):
                 time.sleep(2)
                 n += 1
-            download('http://dl.dropbox.com/u/2435953/dlserials.txt')
-            self.newFile = True
-    
     def stop(self):
         self.kill = True
+"""
 
 
-
+"""
 def GPIOinit():
     # Set GPIO for RPi pin numbers
     GPIO.setmode(GPIO.BOARD)
@@ -127,6 +153,7 @@ def GPIOinit():
     GPIO.setup(12, GPIO.OUT)
     # set 12 low
     GPIO.setup(12, GPIO.LOW)
+"""
 
 def main():
     
@@ -140,16 +167,18 @@ def main():
             # Setup GPIO
             if GPIO_available:
                 logger.info("Enabling GPIO")
-                GPIOinit()
+                initGPIO()
     
             # Start card monitor
             card = CardObservingThread()
+            card.setDaemon(True)
             card.start()
-    
+
             if (card.is_alive()):
                 logger.info("Starting Background File Service")
                 # Start file grabbing process
                 backgroundFile = FetchFile()
+                backgroundFile.setDaemon(True)
                 backgroundFile.start()
 
                 # Start web server    

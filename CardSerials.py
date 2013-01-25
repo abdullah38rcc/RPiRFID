@@ -7,12 +7,10 @@ class CardSerials():
         self.logger = logging.getLogger('CardSerials.py')
         self.logger.setLevel(logging.DEBUG)
         
-        self.currentCards = []
-        self.d = {}
+        self.currentCards = [] # List
+        self.d = {} # Dictionary
         self.serials = {}
-        
-        self.logger.debug('Hello from CardSerials!')
-        
+                
     def addCard(self, serial):
         self.currentCards.append(serial)
         self.logger.debug("Added a card to the list")
@@ -39,11 +37,14 @@ class CardSerials():
         # transfer lines of serials to a list        
         s = []
         
+        count = 0
         for line in localFile.readlines():
+            count = count + 1
             line = line.rstrip()
             s.append(line)
         localFile.close()
-        self.logger.debug('Parsed File into List:')
+        tempText = "Parsed " + str(count) + "lines into list"
+        self.logger.debug(tempText)
         self.logger.debug(self.s)
    
         # transfer serials from the list to a dictionary
