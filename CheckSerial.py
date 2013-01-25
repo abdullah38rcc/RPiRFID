@@ -68,7 +68,7 @@ class CardObserver(CardObserver):
         if (removedcards):
             cs.removeCard(removedcards[0])
             logger.info('Removed: %s', removedcards)
-
+"""
 class CardObservingThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -91,6 +91,7 @@ class CardObservingThread(threading.Thread):
                 logger.warning('cardmonitor does not exist')
             if (self.cardobserver == None):
                 logger.warning('cardobserver does not exist')
+"""
 
 """
 # Class for background flashing of LED
@@ -123,7 +124,7 @@ class FetchFile(threading.Thread):
         self.newFile = False
         
     def run(self):
-#        while (not self.kill):
+        # while (not self.kill):
         while (True):
             # Check for a new file every 60 (2 * 30) seconds
             try:                
@@ -134,7 +135,7 @@ class FetchFile(threading.Thread):
                 logging.warning('could not download serial file')
             sleep(60)
 
-"""
+            """
             # old thread code
             n = 0
             while (not self.kill) and (n < 30):
@@ -142,7 +143,7 @@ class FetchFile(threading.Thread):
                 n += 1
     def stop(self):
         self.kill = True
-"""
+    """
 
 
 """
@@ -156,61 +157,78 @@ def GPIOinit():
 """
 
 def main():
-    
-        import sys
-        if len(sys.argv) == 2:
-            try:
-                download(sys.argv[1])
-            except IOError:
-                print 'Filename not found.'
-        else:  
-            # Setup GPIO
-            if GPIO_available:
-                logger.info("Enabling GPIO")
-                initGPIO()
-    
+    import sys
+    if len(sys.argv) == 2:
+        try:
+            download(sys.argv[1])
+        except IOError:
+            print 'Filename not found.'
+    else:  
+        # Setup GPIO
+        if GPIO_available:
+            logger.info("Enabling GPIO")
+            initGPIO()
+            """    
             # Start card monitor
             card = CardObservingThread()
             card.setDaemon(True)
             card.start()
+            """
+    # Instanciate a monitor
+    cardmonitor = CardMonitor()
+    # Create a new observerable
+    cardobserver = CardObserver()
 
-            if (card.is_alive()):
-                logger.info("Starting Background File Service")
-                # Start file grabbing process
-                backgroundFile = FetchFile()
-                backgroundFile.setDaemon(True)
-                backgroundFile.start()
+    try:
+        self.cardmonitor.addObserver(self.cardobserver)
+        self.success = True
+        logger.info('Card Observer Added')
 
-                # Start web server    
-                #logger.info("Starting Web Server")
-                #root = getSerial()
-                #factory = Site(root)
-                #reactor.listenTCP(8880, factory)
-                #reactor.run()
-            else:
-                logger.warning("Did not start background file service")
-    
-            Loop = True
-            while (Loop):
-                # i = raw_input ("q for exit\n")
-                #if (i == 'q'):
-                #    logger.info('Quitting')
-                #    if (backgroundFile.isAlive()):
-                #        backgroundFile.stop()
-                #    Loop = False
-                    # break # breaks out of the while loop
-                # New file downloaded. Parse to dict
-                if (backgroundFile.newFile == True):
-                    backgroundFile.newFile = False
-                    cs.parseFile("dlserials.txt")
-                
-                if (cs.currentCards):
-                    if (cs.validCards()):
-                        logger.info("Valid card found")
-                    else:
-                        logger.info("Card Present but Not Valid")
+    except:
+        logger.warning('addObserver exception')
+        if (self.cardmonitor == None):
+            logger.warning('cardmonitor does not exist')
+        if (self.cardobserver == None):
+            logger.warning('cardobserver does not exist')
+
+#            if (card.is_alive()):
+        if (True):
+            logger.info("Starting Background File Service")
+            # Start file grabbing process
+            backgroundFile = FetchFile()
+            backgroundFile.setDaemon(True)
+            backgroundFile.start()
+
+            # Start web server    
+            #logger.info("Starting Web Server")
+            #root = getSerial()
+            #factory = Site(root)
+            #reactor.listenTCP(8880, factory)
+            #reactor.run()
+        else:
+            logger.warning("Did not start background file service")
+
+        Loop = True
+        while (Loop):
+            # i = raw_input ("q for exit\n")
+            #if (i == 'q'):
+            #    logger.info('Quitting')
+            #    if (backgroundFile.isAlive()):
+            #        backgroundFile.stop()
+            #    Loop = False
+                # break # breaks out of the while loop
+            # New file downloaded. Parse to dict
+            if (backgroundFile.newFile == True):
+                backgroundFile.newFile = False
+                cs.parseFile("dlserials.txt")
+            
+            if (cs.currentCards):
+                if (cs.validCards()):
+                    logger.info("Valid card found")
                 else:
-                    logger.debug("No Cards Present")
+                    logger.info("Card Present but Not Valid")
+            else:
+                logger.debug("No Cards Present")
                     
 if (__name__ == "__main__"):
     main()
