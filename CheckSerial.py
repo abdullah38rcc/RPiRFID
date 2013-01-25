@@ -186,9 +186,9 @@ def main():
 
     except:
         logger.warning('addObserver exception')
-        if (self.cardmonitor == None):
+        if (cardmonitor == None):
             logger.warning('cardmonitor does not exist')
-        if (self.cardobserver == None):
+        if (cardobserver == None):
             logger.warning('cardobserver does not exist')
 
 #            if (card.is_alive()):
