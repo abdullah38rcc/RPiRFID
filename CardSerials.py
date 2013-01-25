@@ -45,7 +45,7 @@ class CardSerials():
         localFile.close()
         tempText = "Parsed " + str(count) + "lines into list"
         self.logger.debug(tempText)
-        self.logger.debug(self.s)
+        self.logger.debug(s)
    
         # transfer serials from the list to a dictionary
         for x in s:

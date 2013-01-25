@@ -133,7 +133,7 @@ class FetchFile(threading.Thread):
                 self.newFile = True
             except:
                 logging.warning('could not download serial file')
-            sleep(60)
+            time.sleep(60)
 
             """
             # old thread code
@@ -180,55 +180,54 @@ def main():
     cardobserver = CardObserver()
 
     try:
-        self.cardmonitor.addObserver(self.cardobserver)
-        self.success = True
+        cardmonitor.addObserver(cardobserver)
+        success = True
         logger.info('Card Observer Added')
-
     except:
         logger.warning('addObserver exception')
-        if (cardmonitor == None):
-            logger.warning('cardmonitor does not exist')
-        if (cardobserver == None):
-            logger.warning('cardobserver does not exist')
+    if (cardmonitor == None):
+        logger.warning('cardmonitor does not exist')
+    if (cardobserver == None):
+        logger.warning('cardobserver does not exist')
 
-#            if (card.is_alive()):
-        if (True):
-            logger.info("Starting Background File Service")
-            # Start file grabbing process
-            backgroundFile = FetchFile()
-            backgroundFile.setDaemon(True)
-            backgroundFile.start()
+    # if (card.is_alive()):
+    if (True):
+        logger.info("Starting Background File Service")
+        # Start file grabbing process
+        backgroundFile = FetchFile()
+        backgroundFile.setDaemon(True)
+        backgroundFile.start()
 
-            # Start web server    
-            #logger.info("Starting Web Server")
-            #root = getSerial()
-            #factory = Site(root)
-            #reactor.listenTCP(8880, factory)
-            #reactor.run()
-        else:
-            logger.warning("Did not start background file service")
+        # Start web server    
+        #logger.info("Starting Web Server")
+        #root = getSerial()
+        #factory = Site(root)
+        #reactor.listenTCP(8880, factory)
+        #reactor.run()
+    else:
+        logger.warning("Did not start background file service")
 
-        Loop = True
-        while (Loop):
-            # i = raw_input ("q for exit\n")
-            #if (i == 'q'):
-            #    logger.info('Quitting')
-            #    if (backgroundFile.isAlive()):
-            #        backgroundFile.stop()
-            #    Loop = False
-                # break # breaks out of the while loop
-            # New file downloaded. Parse to dict
-            if (backgroundFile.newFile == True):
-                backgroundFile.newFile = False
-                cs.parseFile("dlserials.txt")
-            
-            if (cs.currentCards):
-                if (cs.validCards()):
-                    logger.info("Valid card found")
-                else:
-                    logger.info("Card Present but Not Valid")
+    Loop = True
+    while (Loop):
+        # i = raw_input ("q for exit\n")
+        #if (i == 'q'):
+        #    logger.info('Quitting')
+        #    if (backgroundFile.isAlive()):
+        #        backgroundFile.stop()
+        #    Loop = False
+            # break # breaks out of the while loop
+        # New file downloaded. Parse to dict
+        if (backgroundFile.newFile == True):
+            backgroundFile.newFile = False
+            cs.parseFile("dlserials.txt")
+        
+        if (cs.currentCards):
+            if (cs.validCards()):
+                logger.info("Valid card found")
             else:
-                logger.debug("No Cards Present")
+                logger.info("Card Present but Not Valid")
+        else:
+            logger.debug("No Cards Present")
                     
 if (__name__ == "__main__"):
     main()
