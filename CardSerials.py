@@ -6,52 +6,66 @@ class CardSerials():
         logging.basicConfig()
         self.logger = logging.getLogger('CardSerials.py')
         self.logger.setLevel(logging.DEBUG)
-        
-        self.currentCards = [] # List
-        self.d = {} # Dictionary
+
+        self.currentCards = []  # List
+        self.d = {}  # Dictionary
         self.serials = {}
-                
-    def addCard(self, serial):
-        self.logger.debug("Attempting to add %s", serial)
-        #if (serial.find('/')):
-        serialStripped = '3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 00 03 00 00 00 00 68'
-        self.logger.debug('Post formating: %s', serialStripped)
+
+    def snipSerial(self, serialSnip, delim):
+        num = serialSnip.find(delim)
+        self.logger.debug('Found delimiter at %s', num)
+        if (num > 0):
+            return serialSnip[:num]
+        else:
+            return serialSnip
+
+    def addCard(self, serialAdd):
+        print type(serialAdd)
+        self.logger.debug("Attempting to add %s", serialAdd)
+        # Some serials come with a manufacture suffix so we need to remove it
+        self.serialSnipped = self.snipSerial(serialAdd, '/')
+        self.logger.debug('Post formating: %s', self.serialSnipped)
+
         try:
-            self.currentCards.append(serialStripped)
+            self.currentCards.append(self.serialSnipped)
             self.logger.info("Added a card to the list:")
-            self.logger.debug("Added serial: %s", serialStripped)
+            self.logger.debug("Added serial: %s", self.serialSnipped)
         except:
-            self.logger.debug("Could not add to list: %s", serialStripped)
-    
-    def removeCard(self, serial):
+            self.logger.debug("Could not add to list: %s", self.serialSnipped)
+
+    def removeCard(self, serialRemove):
+        self.logger.debug("Attempting to remove %s", serialRemove)
+        self.serialSnipped = self.snipSerial(serialRemove, '/')
+        self.logger.debug("Post formatting: %s", self.serialSnipped)
         try:
-            self.currentCards.remove(serial)
+            self.currentCards.remove(serialRemove)
             self.logger.info("Removed a card from the list")
-            self.logger.debug("Removed: %s", serial)
+            self.logger.debug("Removed: %s", serialRemove)
         except:
-            self.logger.debug("Could not remove %s", serial)
-    
+            self.logger.debug("Could not remove %s", serialRemove)
+
     def validCards(self):
         """Returns True if there are any cards present that are authorized"""
         for s in self.currentCards:
             self.logger.debug('Testing for s in self.d')
             self.logger.debug('Looking for: %s', s)
-          
+
             #if (self.d[s]):
             if s in self.d:
+
                 return True
             else:
                 return False
-    
+
     def parseFile(self, inFile):
         """Take in a file of serial numbers and return a dictionary of serials"""
-        
+
         # Open the file for reading in
         localFile = open(inFile, "r")
-    
-        # transfer lines of serials to a list        
+
+        # transfer lines of serials to a list
         s = []
-        
+
         count = 0
         for line in localFile.readlines():
             count = count + 1
@@ -61,18 +75,18 @@ class CardSerials():
         tempText = "Parsed " + str(count) + " lines into list:"
         self.logger.debug(tempText)
         self.logger.debug(s)
-   
+
         # transfer serials from the list to a dictionary
         for x in s:
             self.d[x] = True
         self.logger.debug('Parsed Dictionary:')
         self.logger.debug(self.d)
-        
+
         return self.d
-    
+
 
 def oldFindSerial(fileName, textString):
-    infile = open (fileName, "r")
+    infile = open(fileName, "r")
     text = infile.read()
     infile.close()
 
@@ -96,7 +110,6 @@ if __name__ == '__main__':
     #d = parseFile("dlserials.txt")
     #if "3B 06 01 00 38 05 50 07" in d:
     #    print "Found"
-        
+
     #print findSerial(d, "3B 06 01 00 38 05 50 07")
     pass
-
