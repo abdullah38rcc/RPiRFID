@@ -32,7 +32,7 @@ except ImportError:
 # authorized = False
 logging.basicConfig()
 logger = logging.getLogger('CheckSerial.py')
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.INFO)
 
 if (GPIO_available):
     logger.debug("GPIO Available")
@@ -70,11 +70,10 @@ class CardObserver(CardObserver):
             # have to avoid creating another pointer
             # by converting the list element to string
             # [:] would have converted the full list
-            serialNum = str(addedcards[0])
-            cs.addCard(serialNum)
+            cs.addCard(str(addedcards[0]))
             logger.info('Added: %s', addedcards)
         if (removedcards):
-            cs.removeCard(removedcards[0])
+            cs.removeCard(str(removedcards[0]))
             logger.info('Removed: %s', removedcards)
 """
 class CardObservingThread(threading.Thread):
@@ -232,13 +231,14 @@ def main():
             backgroundFile.newFile = False
             cs.parseFile("dlserials.txt")
 
-        if (cs.currentCards):
+        if (cs.cardPresent()):
             if (cs.validCards()):
                 logger.info("Valid card found")
             else:
                 logger.info("Card Present but Not Valid")
         else:
-            logger.debug("No Cards Present")
+            logger.info("No Cards Present")
+        time.sleep(.5)
 
 if (__name__ == "__main__"):
     main()
