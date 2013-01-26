@@ -4,7 +4,7 @@ import logging
 class CardSerials():
     def __init__(self):
         logging.basicConfig()
-        self.logger = logging.getLogger('CardSerials.py')
+        self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
 
         self.currentCards = []  # List

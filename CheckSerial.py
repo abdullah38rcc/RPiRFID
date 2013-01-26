@@ -32,7 +32,11 @@ except ImportError:
 # authorized = False
 logging.basicConfig()
 logger = logging.getLogger('CheckSerial.py')
+# logging levels for lowest to highest: 
+# debug, info, warning (default), error, critical
 logger.setLevel(logging.INFO)
+
+# TODO: Added file logging
 
 if (GPIO_available):
     logger.debug("GPIO Available")
