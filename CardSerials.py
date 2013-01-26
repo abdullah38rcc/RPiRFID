@@ -7,24 +7,37 @@ class CardSerials():
         self.logger = logging.getLogger('CardSerials.py')
         self.logger.setLevel(logging.DEBUG)
         
-        self.currentCards = []
-        self.d = {}
+        self.currentCards = [] # List
+        self.d = {} # Dictionary
         self.serials = {}
-        
-        self.logger.debug('Hello from CardSerials!')
-        
+                
     def addCard(self, serial):
-        self.currentCards.append(serial)
-        self.logger.debug("Added a card to the list")
+        self.logger.debug("Attempting to add %s", serial)
+        #if (serial.find('/')):
+        serialStripped = '3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 00 03 00 00 00 00 68'
+        self.logger.debug('Post formating: %s', serialStripped)
+        try:
+            self.currentCards.append(serialStripped)
+            self.logger.info("Added a card to the list:")
+            self.logger.debug("Added serial: %s", serialStripped)
+        except:
+            self.logger.debug("Could not add to list: %s", serialStripped)
     
     def removeCard(self, serial):
-        self.currentCards.remove(serial)
-        self.logger.debug("Attempted to removed a card from the list")
-
+        try:
+            self.currentCards.remove(serial)
+            self.logger.info("Removed a card from the list")
+            self.logger.debug("Removed: %s", serial)
+        except:
+            self.logger.debug("Could not remove %s", serial)
     
     def validCards(self):
         """Returns True if there are any cards present that are authorized"""
         for s in self.currentCards:
+            self.logger.debug('Testing for s in self.d')
+            self.logger.debug('Looking for: %s', s)
+          
+            #if (self.d[s]):
             if s in self.d:
                 return True
             else:
@@ -39,17 +52,20 @@ class CardSerials():
         # transfer lines of serials to a list        
         s = []
         
+        count = 0
         for line in localFile.readlines():
+            count = count + 1
             line = line.rstrip()
             s.append(line)
         localFile.close()
-        self.logger.debug('Parsed File into List:')
-        self.logger.debug(self.s)
+        tempText = "Parsed " + str(count) + " lines into list:"
+        self.logger.debug(tempText)
+        self.logger.debug(s)
    
         # transfer serials from the list to a dictionary
         for x in s:
             self.d[x] = True
-        self.logger.debug('Parsed Dictionary')
+        self.logger.debug('Parsed Dictionary:')
         self.logger.debug(self.d)
         
         return self.d
