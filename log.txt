@@ -1,0 +1,25 @@
+00000000 debuglog.c:269:DebugLogSetLevel() debug level=debug
+00001995 debuglog.c:298:DebugLogSetCategory() Debug options: APDU
+00002509 configfile.l:298:DBGetReaderList() Parsing conf file: /usr/local/etc/reader.conf.d
+00001783 pcscdaemon.c:525:main() pcsc-lite 1.8.7 daemon ready.
+00016803 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x1D6B, PID: 0x0002, path: /dev/bus/usb/001/001
+00002767 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x1D6B, PID: 0x0002, path: /dev/bus/usb/001/001
+00002779 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x0424, PID: 0x9512, path: /dev/bus/usb/001/002
+00002867 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x0424, PID: 0xEC00, path: /dev/bus/usb/001/003
+00002752 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x0424, PID: 0x9512, path: /dev/bus/usb/001/002
+00002786 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8500, path: /dev/bus/usb/001/004
+00002824 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8501, path: /dev/bus/usb/001/005
+00003431 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8501, path: /dev/bus/usb/001/005
+00002783 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8500, path: /dev/bus/usb/001/004
+00002773 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x076B, PID: 0x5124, path: /dev/bus/usb/001/007
+00001984 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x076B, PID: 0x5124, path: /dev/bus/usb/001/007
+00001580 hotplug_libudev.c:312:HPAddDevice() Adding USB device: OMNIKEY 5x25 CL
+00001861 readerfactory.c:978:RFInitializeReader() Attempting startup of OMNIKEY 5x25 CL (OKCM0021107111459044297250858810) 00 00 using /usr/local/lib/pcsc/drivers/ifdokrfid_lnx_i686-2.10.0.1.bundle/Contents/Linux/ifdokrfid.so
+00002071 dyn_unix.c:37:DYN_LoadLibrary() /usr/local/lib/pcsc/drivers/ifdokrfid_lnx_i686-2.10.0.1.bundle/Contents/Linux/ifdokrfid.so: /usr/local/lib/pcsc/drivers/ifdokrfid_lnx_i686-2.10.0.1.bundle/Contents/Linux/ifdokrfid.so: cannot open shared object file: No such file or directory
+00001568 readerfactory.c:985:RFInitializeReader() RFLoadReader failed: 0x80100014
+00001562 readerfactory.c:312:RFAddReader() OMNIKEY 5x25 CL (OKCM0021107111459044297250858810) init failed.
+00001451 hotplug_libudev.c:384:HPAddDevice() Failed adding USB device: OMNIKEY 5x25 CL
+00002671 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8500, path: /dev/bus/usb/001/004
+00002788 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x7392, PID: 0x7811, path: /dev/bus/usb/001/006
+00002880 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x2101, PID: 0x8500, path: /dev/bus/usb/001/004
+00002739 hotplug_libudev.c:260:get_driver() Looking for a driver for VID: 0x0424, PID: 0x9512, path: /dev/bus/usb/001/002
