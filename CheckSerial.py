@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
-from smartcard.util import * 
+from smartcard.util import *
 
 import logging
 
@@ -32,7 +32,7 @@ except ImportError:
 # authorized = False
 logging.basicConfig()
 logger = logging.getLogger('CheckSerial.py')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.NOTSET)
 
 if (GPIO_available):
     logger.debug("GPIO Available")
@@ -41,6 +41,7 @@ else:
 
 # Setup Serial Processing Object
 cs = CardSerials()
+
 
 # Web content handler
 class ReturnWebpage(Resource):
@@ -52,10 +53,12 @@ class ReturnWebpage(Resource):
         authorized = findSerial('dlserials.txt', str(self.serialNum))
         return "<html><body><pre>%s</pre></body></html>" % (authorized,)
 
+
 # Root webpage
 class getSerial(Resource):
     def getChild(self, name, request):
         return ReturnWebpage(int(name))
+
 
 class CardObserver(CardObserver):
     def __init__(self):
@@ -63,7 +66,12 @@ class CardObserver(CardObserver):
 
     def update(self, observable, (addedcards, removedcards)):
         if (addedcards):
-            cs.addCard(addedcards[0])
+            #print "addedcards: ", type(addedcards)
+            # have to avoid creating another pointer
+            # by converting the list element to string
+            # [:] would have converted the full list
+            serialNum = str(addedcards[0])
+            cs.addCard(serialNum)
             logger.info('Added: %s', addedcards)
         if (removedcards):
             cs.removeCard(removedcards[0])
@@ -105,6 +113,7 @@ class FlashLED(threading.Thread):
             GPIO.setup(12, GPIO.LOW)
 """
 
+
 # Pulls down file from dropbox and saves to local disk
 def download(url):
     """ Download file from web and save """
@@ -116,18 +125,19 @@ def download(url):
     localFile.close()
     logger.debug('Done saving file')
 
-# Background process to fetch file every minute		
+
+# Background process to fetch file every minute
 class FetchFile(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.kill = False
         self.newFile = False
-        
+
     def run(self):
         # while (not self.kill):
         while (True):
             # Check for a new file every 60 (2 * 30) seconds
-            try:                
+            try:
                 download('http://dl.dropbox.com/u/2435953/dlserials.txt')
                 logging.info('downloaded file')
                 self.newFile = True
@@ -156,6 +166,7 @@ def GPIOinit():
     GPIO.setup(12, GPIO.LOW)
 """
 
+
 def main():
     import sys
     if len(sys.argv) == 2:
@@ -163,12 +174,12 @@ def main():
             download(sys.argv[1])
         except IOError:
             print 'Filename not found.'
-    else:  
+    else:
         # Setup GPIO
         if GPIO_available:
             logger.info("Enabling GPIO")
             initGPIO()
-            """    
+            """
             # Start card monitor
             card = CardObservingThread()
             card.setDaemon(True)
@@ -198,7 +209,7 @@ def main():
         backgroundFile.setDaemon(True)
         backgroundFile.start()
 
-        # Start web server    
+        # Start web server
         #logger.info("Starting Web Server")
         #root = getSerial()
         #factory = Site(root)
@@ -220,7 +231,7 @@ def main():
         if (backgroundFile.newFile == True):
             backgroundFile.newFile = False
             cs.parseFile("dlserials.txt")
-        
+
         if (cs.currentCards):
             if (cs.validCards()):
                 logger.info("Valid card found")
@@ -228,7 +239,6 @@ def main():
                 logger.info("Card Present but Not Valid")
         else:
             logger.debug("No Cards Present")
-                    
+
 if (__name__ == "__main__"):
     main()
-    
