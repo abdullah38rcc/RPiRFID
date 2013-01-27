@@ -4,6 +4,11 @@ from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import *
 
 import logging
+logging.basicConfig()
+log = logging.getlog(__name__)
+# logging levels for lowest to highest: 
+# debug, info, warning (default), error, critical
+log.setLevel(logging.INFO)
 
 from CardSerials import CardSerials
 
@@ -28,20 +33,13 @@ except ImportError:
     GPIO_available = False
 
 
-# Global
-# authorized = False
-logging.basicConfig()
-logger = logging.getLogger('CheckSerial.py')
-# logging levels for lowest to highest: 
-# debug, info, warning (default), error, critical
-logger.setLevel(logging.INFO)
 
-# TODO: Added file logging
+# TODO: Added file logging (http://docs.python.org/2/howto/logging.html)
 
 if (GPIO_available):
-    logger.debug("GPIO Available")
+    log.debug("GPIO Available")
 else:
-    logger.debug("GPIO Not Available")
+    log.debug("GPIO Not Available")
 
 # Setup Serial Processing Object
 cs = CardSerials()
@@ -75,10 +73,10 @@ class CardObserver(CardObserver):
             # by converting the list element to string
             # [:] would have converted the full list
             cs.addCard(str(addedcards[0]))
-            logger.info('Added: %s', addedcards)
+            log.info('Added: %s', addedcards)
         if (removedcards):
             cs.removeCard(str(removedcards[0]))
-            logger.info('Removed: %s', removedcards)
+            log.info('Removed: %s', removedcards)
 """
 class CardObservingThread(threading.Thread):
     def __init__(self):
@@ -94,14 +92,14 @@ class CardObservingThread(threading.Thread):
         try:
             self.cardmonitor.addObserver(self.cardobserver)
             self.success = True
-            logger.info('Card Observer Added')
+            log.info('Card Observer Added')
 
         except:
-            logger.warning('addObserver exception')
+            log.warning('addObserver exception')
             if (self.cardmonitor == None):
-                logger.warning('cardmonitor does not exist')
+                log.warning('cardmonitor does not exist')
             if (self.cardobserver == None):
-                logger.warning('cardobserver does not exist')
+                log.warning('cardobserver does not exist')
 """
 
 """
@@ -120,13 +118,13 @@ class FlashLED(threading.Thread):
 # Pulls down file from dropbox and saves to local disk
 def download(url):
     """ Download file from web and save """
-    logger.debug('Saving File %s', url)
+    log.debug('Saving File %s', url)
     webFile = urllib.urlopen(url)
     localFile = open("dlserials.txt", "w")
     localFile.write(webFile.read())
     webFile.close()
     localFile.close()
-    logger.debug('Done saving file')
+    log.debug('Done saving file')
 
 
 # Background process to fetch file every minute
@@ -172,6 +170,8 @@ def GPIOinit():
 
 def main():
     import sys
+
+    # TODO Add input for URI to serial numbers file
     if len(sys.argv) == 2:
         try:
             download(sys.argv[1])
@@ -180,7 +180,7 @@ def main():
     else:
         # Setup GPIO
         if GPIO_available:
-            logger.info("Enabling GPIO")
+            log.info("Enabling GPIO")
             initGPIO()
             """
             # Start card monitor
@@ -196,36 +196,36 @@ def main():
     try:
         cardmonitor.addObserver(cardobserver)
         success = True
-        logger.info('Card Observer Added')
+        log.info('Card Observer Added')
     except:
-        logger.warning('addObserver exception')
+        log.warning('addObserver exception')
     if (cardmonitor == None):
-        logger.warning('cardmonitor does not exist')
+        log.warning('cardmonitor does not exist')
     if (cardobserver == None):
-        logger.warning('cardobserver does not exist')
+        log.warning('cardobserver does not exist')
 
     # if (card.is_alive()):
     if (True):
-        logger.info("Starting Background File Service")
+        log.info("Starting Background File Service")
         # Start file grabbing process
         backgroundFile = FetchFile()
         backgroundFile.setDaemon(True)
         backgroundFile.start()
 
         # Start web server
-        #logger.info("Starting Web Server")
+        #log.info("Starting Web Server")
         #root = getSerial()
         #factory = Site(root)
         #reactor.listenTCP(8880, factory)
         #reactor.run()
     else:
-        logger.warning("Did not start background file service")
+        log.warning("Did not start background file service")
 
     Loop = True
     while (Loop):
         # i = raw_input ("q for exit\n")
         #if (i == 'q'):
-        #    logger.info('Quitting')
+        #    log.info('Quitting')
         #    if (backgroundFile.isAlive()):
         #        backgroundFile.stop()
         #    Loop = False
@@ -237,11 +237,11 @@ def main():
 
         if (cs.cardPresent()):
             if (cs.validCards()):
-                logger.info("Valid card found")
+                log.info("Valid card found")
             else:
-                logger.info("Card Present but Not Valid")
+                log.info("Card Present but Not Valid")
         else:
-            logger.info("No Cards Present")
+            log.info("No Cards Present")
         time.sleep(.5)
 
 if (__name__ == "__main__"):
