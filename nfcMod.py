@@ -43,7 +43,7 @@ def loop():
             print "UID:", tag.getUID()
         else:
             print "No Tag"
-        clf.poll()
+        tag = clf.poll()
         time.sleep(1)
 
 if __name__ == '__main__':

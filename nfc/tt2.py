@@ -156,8 +156,6 @@ class Type2Tag(tag.TAG):
         self._mmap = dict()
         self._sync = set()
         self._page = 0
-        print "dev: ", dev
-        print "data: ", data
         try: self._ndef = NDEF(self)
         except Exception as e:
             log.error("while reading ndef: " + str(e))

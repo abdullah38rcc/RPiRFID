@@ -2,8 +2,8 @@
 
 import logging
 logging.basicConfig()
-log = logging.getlog(__name__)
-# logging levels for lowest to highest: 
+log = logging.getLogger(__name__)
+# logging levels for lowest to highest:
 # debug, info, warning (default), error, critical
 log.setLevel(logging.INFO)
 
@@ -27,6 +27,7 @@ def download(url):
     localFile.close()
     log.debug('Done saving file')
 
+
 # Background process to fetch file every minute
 class FetchFile(threading.Thread):
     def __init__(self):
@@ -45,6 +46,10 @@ class FetchFile(threading.Thread):
             except:
                 logging.warning('could not download serial file')
             time.sleep(60)
+
+
+# def startBackgroundFileService():
+
 
 
 def main():
@@ -71,7 +76,7 @@ def main():
         log.warning("Could not import nfc lib")
         exit()
 
-    import nfc.nded
+    import nfc.ndef
 
     nfcreader = nfc.ContactlessFrontend()
     if nfcreader is None:
@@ -82,11 +87,31 @@ def main():
         log.warning("Could not connect to an NFC reader")
         exit()
 
+    log.info("Starting Background File Service")
+    # Start file grabbing process
+    backgroundFile = FetchFile()
+    backgroundFile.setDaemon(True)
+    backgroundFile.start()
+
+    tagNumber = None
+    # MAIN LOOP
     while(True):
+        if (backgroundFile.newFile == True):
+            backgroundFile.newFile = False
+            cs.parseFile("dlserials.txt")
+
         tag = nfcreader.poll()
         if tag is None:
+            tag = nfcreader.poll()
+            """# Try a second time
+            if tag is None:
+                tag = nfcreader.poll()"""
+
+        if tag is None:
+            log.info("No badge detected")
             if (GPIO_available):
                 Lamps.noBadge()
+
         else:
             tagNumber = tag.getUID()
 
@@ -98,10 +123,11 @@ def main():
                     log.info("Turning on Green Lamp")
                     Lamps.badgeMatch()
             else:
-                log.infi("Present badge is not authorized")
+                log.info("Present badge is not authorized")
                 if (GPIO_available):
                     log.info("Turning on Red Lamp")
                     Lamps.badgeNotFound()
+        tagNumber = None
         time.sleep(1)
 
 if (__name__ == "__main__"):
