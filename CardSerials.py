@@ -67,6 +67,13 @@ class CardSerials():
                 self.logger.info("Card not found in dictionary")
                 return False
 
+    def findCard(self, card):
+        """ Returns True if the serial number passed is in the authorized list"""
+        if card in self.d:
+            return True
+        else:
+            return False
+
     def parseFile(self, inFile):
         """Take in a file of serial numbers and return a dictionary of serials"""
 

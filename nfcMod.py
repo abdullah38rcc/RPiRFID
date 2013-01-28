@@ -35,14 +35,15 @@ def main():
 
 
 def loop():
-    while (True):
-        clf = nfc.ContactlessFrontend()
+    clf = nfc.ContactlessFrontend()
+
+    while (True):        
         tag = clf.poll()
         if not tag is None:
             print "UID:", tag.getUID()
         else:
             print "No Tag"
-        clf.close()
+        clf.poll()
         time.sleep(1)
 
 if __name__ == '__main__':
