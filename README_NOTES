@@ -153,4 +153,14 @@ $ ./configure --with-drivers=acr122
 $ make clean && make && sudo make install
 // still bad. Every time I run nfc-list pcscd is run. Ran pcscd -fd and... GOT ATR Serials back from a NFC tag!!!
 
+25 Jan 13
+SO, ATR is the same for similar brand tags. WTF!
+Need to keep pcscd from running when the NFC reader is plugged in.
+
+$ lsusb
+Bus 002 Device 009: ID 072f:2200 Advanced Card Systems, Ltd
+$ lsusb -vs 002:009
+idVendor 0x072f
+idProduct 0x2200
+This Vendor/Product id combination exists in /usr/lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
 

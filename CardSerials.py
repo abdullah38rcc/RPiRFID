@@ -4,18 +4,28 @@ import logging
 class CardSerials():
     def __init__(self):
         logging.basicConfig()
-        self.logger = logging.getLogger('CardSerials.py')
+        self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
 
         self.currentCards = []  # List
         self.d = {}  # Dictionary
         self.serials = {}
 
+    # return true if a card serial is in the list
+    def cardPresent(self):
+        if self.currentCards.__len__() > 0:
+            self.logger.debug("self.currentCards.len=%s", str(self.currentCards.__len__()))
+            self.logger.debug("")
+            return True
+        else:
+            self.logger.debug('No cards present in currentCards[]')
+            return False
+
     def snipSerial(self, serialSnip, delim):
         num = serialSnip.find(delim)
         self.logger.debug('Found delimiter at %s', num)
         if (num > 0):
-            return serialSnip[:num]
+            return serialSnip[:num].strip()
         else:
             return serialSnip
 
@@ -38,24 +48,31 @@ class CardSerials():
         self.serialSnipped = self.snipSerial(serialRemove, '/')
         self.logger.debug("Post formatting: %s", self.serialSnipped)
         try:
-            self.currentCards.remove(serialRemove)
+            self.currentCards.remove(self.serialSnipped)
             self.logger.info("Removed a card from the list")
-            self.logger.debug("Removed: %s", serialRemove)
+            self.logger.debug("Removed: %s", self.serialSnipped)
         except:
-            self.logger.debug("Could not remove %s", serialRemove)
+            self.logger.debug("Could not remove %s", self.serialSnipped)
 
     def validCards(self):
         """Returns True if there are any cards present that are authorized"""
         for s in self.currentCards:
-            self.logger.debug('Testing for s in self.d')
-            self.logger.debug('Looking for: %s', s)
-
+            self.logger.debug('Testing for \'%s\' in self.d', s)
+            # self.logger.debug('Looking for: %s', s)
             #if (self.d[s]):
             if s in self.d:
-
+                self.logger.info("Card found in dictionary")
                 return True
             else:
+                self.logger.info("Card not found in dictionary")
                 return False
+
+    def findCard(self, card):
+        """ Returns True if the serial number passed is in the authorized list"""
+        if card in self.d:
+            return True
+        else:
+            return False
 
     def parseFile(self, inFile):
         """Take in a file of serial numbers and return a dictionary of serials"""

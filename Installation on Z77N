@@ -1,0 +1,21 @@
+Installation on Z77N
+
+amosk@Z77N:~$ sudo apt-get install pcscd gcc swig python2.7-dev pcsc-tools autoconf libtool libusb-dev
+
+$ svn checkout http://libnfc.googlecode.com/svn/trunk/ libnfc-read-only
+$ cd libnfc-read-only
+$ autoreconf -vis
+$ ./configure
+$ make
+$ sudo make install
+
+Downloaded pyscard from http://sourceforge.net/projects/pyscard/
+
+$sudo setup.py build_ext install
+
+got winscard.h error
+	sudo cp -r ~/Desktop/temp/PCSC/ /usr/include
+now getting "/usr/include/PCSC/winscard.h:20:22: fatal error: pcsclite.h: No such file or directory", fixed with...
+
+$ sudo mv /usr/include/PCSC/pcsclite.h.in /usr/include/PCSC/pcsclite.h
+
