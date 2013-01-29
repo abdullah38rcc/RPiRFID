@@ -14,6 +14,7 @@ from CardSerials import CardSerials
 import urllib
 import threading
 import time
+import os
 
 
 # Pulls down file from dropbox and saves to local disk
@@ -39,12 +40,19 @@ class FetchFile(threading.Thread):
         # while (not self.kill):
         while (True):
             # Check for a new file every 60 (2 * 30) seconds
+
+            """
             try:
                 download('http://dl.dropbox.com/u/2435953/dlserials.txt')
                 logging.info('downloaded file')
                 self.newFile = True
             except:
-                logging.warning('could not download serial file')
+                logging.warning('could not download serial file')"""
+            cliCMD = "smbget --username='amosk' --password='HOme12!@' --workgroup='workgroup' -v smb://SambaM45.local/sambashared/dlserials.txt"
+            fi, fo, fe=os.popen3(cliCMD)
+            for i in fe.readlines():
+                log.error("smbget error: %s", i)
+
             time.sleep(60)
 
 

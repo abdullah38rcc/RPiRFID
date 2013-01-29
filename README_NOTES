@@ -160,7 +160,17 @@ Need to keep pcscd from running when the NFC reader is plugged in.
 $ lsusb
 Bus 002 Device 009: ID 072f:2200 Advanced Card Systems, Ltd
 $ lsusb -vs 002:009
+bInterfaceClass is 0x0b or 11d
 idVendor 0x072f
 idProduct 0x2200
+See (http://ludovicrousseau.blogspot.com/2010/09/pcscd-auto-start.html)
+pcscd latches on to any device with interface 0x0b, this was verified with
+$ sudo pcscd -fTd
 This Vendor/Product id combination exists in /usr/lib/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
+Created a backup and removed the 15th from the last entry. Made copy in RPiRFID: Info.plist.removedACS_NFC
+$ sudo nfc-poll 
+Worked!
 
+28 Jan 13
+Got NFC reader working
+Got smbget --username='amosk' --password='HOme12!@' --workgroup='workgroup' -v smb://SambaM45.local/sambashared/textfile.txt  to work from M45 samba share

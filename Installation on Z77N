@@ -19,3 +19,14 @@ now getting "/usr/include/PCSC/winscard.h:20:22: fatal error: pcsclite.h: No suc
 
 $ sudo mv /usr/include/PCSC/pcsclite.h.in /usr/include/PCSC/pcsclite.h
 
+Removed ACS from ifd-ccid rules (See README_NOTES) so pcscd wouldn't grab the USB device.
+
+$ sudo nfc-poll works
+$ sudo chmod 666 /dev/bus/usb/002/012
+now just $ nfc-poll works.
+TODO: Access to USB devices is root only by default. Install udev rules file into /etc/udev/rules.d/ to keep user access. See https://code.google.com/p/libnfc/source/browse/trunk/contrib/udev/42-pn53x.rules
+Got nfcpy from https://launchpad.net/nfcpy
+$ bzr branch lp:nfcpy
+$ sudo apt-get install python-usb
+$ sudo cp -r ~/Workspace/nfcpy /usr/local/lib/python2.7/dist-packages/nfcpy
+

@@ -97,3 +97,6 @@ sudo apt-get install swig gcc
 
 $ sudo python setup.py build_ext install
 
+28 Jan 12
+Samba file grabbing
+$ install "samba" for smbget

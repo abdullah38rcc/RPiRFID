@@ -69,6 +69,8 @@ class CardSerials():
 
     def findCard(self, card):
         """ Returns True if the serial number passed is in the authorized list"""
+        """ Remove all spaces. See below for timed comparison """
+        card = card.replace(" ", "")
         if card in self.d:
             return True
         else:
@@ -86,8 +88,17 @@ class CardSerials():
         count = 0
         for line in localFile.readlines():
             count = count + 1
-            line = line.rstrip()
+            """
+            Remove all whitespace
+            $ root@raspberrypi:~# python -m timeit '"".join(" \t foo \n bar ".split())'
+            100000 loops, best of 3: 12.7 usec per loop
+            Remove only spaces
+            $ root@raspberrypi:~# python -m timeit '" \t foo \n bar".replace(" ", "")'
+            100000 loops, best of 3: 8.34 usec per loop
+            # v1: line = line.join(line.split()) // removes \t & \n """
+            line = line.replace(" ", "")  # Only removes spaces
             s.append(line)
+
         localFile.close()
         tempText = "Parsed " + str(count) + " lines into list:"
         self.logger.debug(tempText)
