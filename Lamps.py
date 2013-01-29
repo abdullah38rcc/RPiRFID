@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 import time
 
 RED = 23
-GREEN = 22
-BLUE = 7
+GREEN = 7
+BLUE = 22
 
 def initGPIO():
     GPIO.setmode(GPIO.BOARD)
