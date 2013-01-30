@@ -5,8 +5,8 @@ logging.basicConfig()
 log = logging.getLogger(__name__)
 # logging levels for lowest to highest:
 # debug, info, warning (default), error, critical
-log.setLevel(logging.INFO)
-
+log.setLevel(logging.DEBUG)
+log.debug("ATS_Machine_Control debug level: DEBUG")
 from CardSerials import CardSerials
 
 # from twisted.web.resource import Resource
@@ -40,18 +40,30 @@ class FetchFile(threading.Thread):
         # while (not self.kill):
         while (True):
             # Check for a new file every 60 (2 * 30) seconds
-
-            """
+           
             try:
                 download('http://dl.dropbox.com/u/2435953/dlserials.txt')
                 logging.info('downloaded file')
                 self.newFile = True
             except:
-                logging.warning('could not download serial file')"""
-            cliCMD = "smbget --username='amosk' --password='HOme12!@' --workgroup='workgroup' -v smb://SambaM45.local/sambashared/dlserials.txt"
-            fi, fo, fe=os.popen3(cliCMD)
-            for i in fe.readlines():
-                log.error("smbget error: %s", i)
+                logging.warning('could not download serial file')
+
+            """
+            try:
+                log.debug("Fetching latest serial file")
+                cliCMD = "smbget --username='amosk' --password='HOme12!@' --workgroup='workgroup' -v smb://SatM45.local/sambashared/dlserials.txt"
+                fi, fo, fe=os.popen3(cliCMD)
+                if fe is None:
+                    log.debug("No errors fetching file")
+                    self.newFile = True
+                else:
+                    log.error("smbget errors: %s", fe)
+                    # for er in fe.readlines():
+                    #    log.error("smbget error: %s", er)
+
+            except:
+                log.warning("Error running smbget")
+            """
 
             time.sleep(60)
 
@@ -105,6 +117,7 @@ def main():
     # MAIN LOOP
     while(True):
         if (backgroundFile.newFile == True):
+            log.debug("Serial file downloaded. Calling parseFile")
             backgroundFile.newFile = False
             cs.parseFile("dlserials.txt")
 
