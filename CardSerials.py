@@ -71,6 +71,9 @@ class CardSerials():
         """ Returns True if the serial number passed is in the authorized list"""
         """ Remove all spaces. See below for timed comparison """
         card = card.replace(" ", "")
+        card = card.strip()
+        card = card.upper()
+        
         if card in self.d:
             return True
         else:
@@ -98,7 +101,8 @@ class CardSerials():
             100000 loops, best of 3: 8.34 usec per loop
             # v1: line = line.join(line.split()) // removes \t & \n """
             line = line.replace(" ", "")  # Only removes spaces
-            line = line.rstrip() 
+            line = line.rstrip()  # Remove trailing new line
+            line = line.upper()  # Make everything uppercase
             s.append(line)
 
         localFile.close()
