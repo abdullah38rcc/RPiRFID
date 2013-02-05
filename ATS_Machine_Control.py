@@ -109,7 +109,7 @@ def main():
 
     #log.info("Starting Background File Service")
     # Start file grabbing process
-    backgroundFile = FetchFile()
+    # backgroundFile = FetchFile()
     # backgroundFile.setDaemon(True)
     # backgroundFile.start()
 
