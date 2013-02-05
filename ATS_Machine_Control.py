@@ -107,11 +107,11 @@ def main():
         log.warning("Could not connect to an NFC reader")
         exit()
 
-    log.info("Starting Background File Service")
+    #log.info("Starting Background File Service")
     # Start file grabbing process
-    backgroundFile = FetchFile()
-    backgroundFile.setDaemon(True)
-    backgroundFile.start()
+    # backgroundFile = FetchFile()
+    # backgroundFile.setDaemon(True)
+    # backgroundFile.start()
 
     tagNumber = None
     # MAIN LOOP
