@@ -73,7 +73,7 @@ class CardSerials():
         card = card.replace(" ", "")
         card = card.strip()
         card = card.upper()
-        
+
         if card in self.d:
             return True
         else:
@@ -104,7 +104,8 @@ class CardSerials():
             line = line.rstrip()  # Remove trailing new line
             line = line.upper()  # Make everything uppercase
             s.append(line)
-
+        # TODO Ignore blank lines
+        
         localFile.close()
         tempText = "Parsed " + str(count) + " lines into list:"
         self.logger.debug(tempText)
