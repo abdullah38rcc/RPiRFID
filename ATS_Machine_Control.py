@@ -135,9 +135,11 @@ def main():
 
         else:
             tagNumber = tag.getUID()
+            tagNumber = tagNumber.strip()
+            tagNumber = tagNumber.upper()
 
         if tagNumber is not None:
-            log.info("Found badge: %s", tag.getUID())
+            log.info("Found badge: %s", tagNumber)
             if cs.findCard(tagNumber):
                 log.info("Found an authorized badge")
                 if (GPIO_available):
