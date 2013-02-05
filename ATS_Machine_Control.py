@@ -38,7 +38,7 @@ class FetchFile(threading.Thread):
 
     def run(self):
         # while (not self.kill):
-        while (True):
+        while (False):
             # Check for a new file every 60 (2 * 30) seconds
            
             try:
