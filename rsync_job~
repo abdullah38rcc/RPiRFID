@@ -1,0 +1,7 @@
+#!/bin/bash
+USER='guest'
+PW=
+OPT='--verbose --update'
+rsync $OPT $USER@smb://SatM45.local/sambashared/dlserials.txt ./dlserials.txt
+
+
