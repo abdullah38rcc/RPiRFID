@@ -87,6 +87,7 @@ class CardSerials():
 
         count = 0
         for line in localFile.readlines():
+            self.logger.debug("Read line: %s", line)
             count = count + 1
             """
             Remove all whitespace
@@ -97,6 +98,7 @@ class CardSerials():
             100000 loops, best of 3: 8.34 usec per loop
             # v1: line = line.join(line.split()) // removes \t & \n """
             line = line.replace(" ", "")  # Only removes spaces
+            line = line.rstrip() 
             s.append(line)
 
         localFile.close()
@@ -140,4 +142,6 @@ if __name__ == '__main__':
     #    print "Found"
 
     #print findSerial(d, "3B 06 01 00 38 05 50 07")
-    pass
+    cs = CardSerials()
+    ld = cs.parseFile("dlserials.txt")
+    print ld
