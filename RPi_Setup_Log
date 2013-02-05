@@ -99,4 +99,4 @@ $ sudo python setup.py build_ext install
 
 28 Jan 12
 Samba file grabbing
-$ install "samba" for smbget
+$ sudo apt-get install samba sambaclient

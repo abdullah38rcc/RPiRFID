@@ -14,6 +14,7 @@ from CardSerials import CardSerials
 import urllib
 import threading
 import time
+import sys
 import os
 
 
@@ -38,15 +39,16 @@ class FetchFile(threading.Thread):
 
     def run(self):
         # while (not self.kill):
-        while (False):
+        while (True):
             # Check for a new file every 60 (2 * 30) seconds
-           
+            """
             try:
                 download('http://dl.dropbox.com/u/2435953/dlserials.txt')
                 logging.info('downloaded file')
                 self.newFile = True
             except:
                 logging.warning('could not download serial file')
+            """
 
             """
             try:
@@ -64,7 +66,7 @@ class FetchFile(threading.Thread):
             except:
                 log.warning("Error running smbget")
             """
-
+            self.newFile = True
             time.sleep(60)
 
 
@@ -82,21 +84,16 @@ def main():
     # TODO: Added file logging (http://docs.python.org/2/howto/logging.html)
 
     try:
-        import Lamps
-        GPIO_available = True
-        log.info("GPIO Available")
-        log.info("Enabling GPIO")
-        Lamps.initGPIO()
-    except ImportError:
-        log.debug("GPIO Not Available")
-
-    try:
         import nfc
     except ImportError:
         log.warning("Could not import nfc lib")
-        exit()
+        sys.exit("Could not import nfc lib")
 
-    import nfc.ndef
+    try:
+        import nfc.ndef
+    except ImportError:
+        log.warning("Could not import nfc.ndef")
+        exit("Could not import nfc.ndef")
 
     nfcreader = nfc.ContactlessFrontend()
     if nfcreader is None:
@@ -105,14 +102,22 @@ def main():
         nfcreader = nfc.ContactlessFrontend()
     if nfcreader is None:
         log.warning("Could not connect to an NFC reader")
-        exit()
+        sys.exit("Could not connect to an NFC reader")
 
-    #log.info("Starting Background File Service")
+    log.info("Starting Background File Service")
     # Start file grabbing process
     backgroundFile = FetchFile()
-    
-    # backgroundFile.setDaemon(True)
-    # backgroundFile.start()
+    backgroundFile.setDaemon(True)
+    backgroundFile.start()
+
+    try:
+        import Lamps
+        GPIO_available = True
+        log.info("GPIO Available")
+        log.info("Enabling GPIO")
+        Lamps.initGPIO()
+    except ImportError:
+        log.debug("GPIO Not Available")
 
     tagNumber = None
     # MAIN LOOP
