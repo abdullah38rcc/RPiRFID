@@ -25,6 +25,7 @@
 
 import logging
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 import os
 import time
@@ -139,11 +140,16 @@ class pn53x(object):
         self.bus.write(frame)
 
         frame = self.bus.read(timeout=100)
-        
+    
+        """ Parse Return data
+        """
+        # SOF = bytearray('\x00\x00\xFF')
+        # ACK = bytearray('\x00\x00\xFF\x00\xFF\x00')
         if frame is None: raise FrameError("no response from pn53x")
         if frame[0:3] != pn53x.SOF: raise FrameError("invalid start of frame")
         if frame != pn53x.ACK: log.warning("missing ack frame from pn53x")
 
+        # If ACK received read dev until frame changes from ACK
         while frame == pn53x.ACK:
             frame = self.bus.read(timeout)
             if frame is None:
@@ -151,13 +157,15 @@ class pn53x(object):
 
         if frame[3] == 255 and frame[4] == 255:
             # extended information frame
+            log.debug("Rcvd extended information frame")
             if sum(frame[5:8]) & 0xFF != 0:
-                raise FrameError("lenght checksum error")
+                raise FrameError("length checksum error")
             LEN, TFI, PD0 = frame[5]*256+frame[6], frame[8], frame[9]
         else:
             # normal information frame 
+            log.debug("Rcvd normal information frame")
             if sum(frame[3:5]) & 0xFF != 0:
-                raise FrameError("lenght checksum error")
+                raise FrameError("length checksum error")
             LEN, TFI, PD0 = frame[3], frame[5], frame[6]
 
         if not TFI == 0xd5:
@@ -167,14 +175,16 @@ class pn53x(object):
                 raise CommandError(0x7f)
         if not PD0 == cmd_code + 1:
             raise FrameError("unexpected response code")
-    
+
         if frame[3] == 255 and frame[4] == 255:
             # extended information frame
             if sum(frame[8:8+LEN+1]) % 256 == 0:
+                log.debug("Returned frame: ", ''.join('%02x ' % ord(byte) for byte in frame))
                 return frame[10:8+LEN]
         else:
             # normal information frame 
             if sum(frame[5:5+LEN+1]) % 256 == 0:
+                log.debug("Returned frame: ", ''.join('%02x ' % ord(byte) for byte in frame))
                 return frame[7:5+LEN]
             
         raise FrameError("data checksum error")
@@ -204,9 +214,13 @@ class pn53x(object):
         return self.command(0x32, bytearray([cfg_item]) + bytearray(cfg_data))
 
     def in_list_passive_target(self, br_ty, initiator_data):
+        # TODO: Remove debug
+        print "debug:in_list_passive_target br_ty: ", br_ty
         br_ty = ("106A", "212F", "424F", "106B", "106J").index(br_ty)
         cmd_data = chr(1) + chr(br_ty) + initiator_data
+        # Send command to reader
         rsp_data = self.command(0x4A, cmd_data, timeout=1000)
+        # Send a chip command. Receive a byte array with the chip response
         return rsp_data[2:] if rsp_data[0] == 1 else None
             
     def in_jump_for_dep(self, communication_mode, baud_rate,
@@ -313,8 +327,8 @@ class Device(nfc.dev.Device):
             self._wtx = 7
 
         # set ATR_RES timeout: 409.6 ms, Thru timeout: 204.8 ms)
-        atr_res_to = 11 # T = 100 * 2^(x-1) µs
-        non_dep_to = 12 # T = 100 * 2^(x-1) µs
+        atr_res_to = 11 # T = 100 * 2^(x-1) Âµs
+        non_dep_to = 12 # T = 100 * 2^(x-1) Âµs
         log.debug("ATR_RES timeout: {0:7.1f} ms".format(0.1*2**(atr_res_to-1)))
         log.debug("non-DEP timeout: {0:7.1f} ms".format(0.1*2**(non_dep_to-1)))
         atr_res_to = chr(atr_res_to); non_dep_to = chr(non_dep_to)
@@ -344,10 +358,20 @@ class Device(nfc.dev.Device):
     def poll_nfca(self):
         log.debug("polling for NFC-A technology")
 
-        rsp = self.dev.in_list_passive_target("106A", "")        
+        rsp = self.dev.in_list_passive_target("106A", "")
+        # if rsp is not None:
         if rsp is not None:
             log.debug("NFC-A target found at 106 kbps")
-            atq = rsp[1] * 256 + rsp[0]
+            # TODO: Remove debug lines 
+            print "debug rsp:\"", rsp, "\""
+            print "rsp len:", rsp.__len__()
+            # Next line sometimes crashes with bytearray index out of range
+            try:
+                atq = rsp[1] * 256 + rsp[0]
+            except IndexError:
+                # partial response rcvd
+                log.debug("Received partial response. NFC tag removed during comm?")
+                
             sak = rsp[2]
             uid = rsp[4:4+rsp[3]]
             platform = ("TT2", "TT4", "DEP", "DEP/TT4")[(sak >> 5) & 0b11]
